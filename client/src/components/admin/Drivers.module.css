@@ -1,0 +1,114 @@
+.container {
+  padding: 30px;
+  background: #fff5f5;
+  min-height: 100vh;
+}
+
+.title {
+  margin-bottom: 20px;
+  color: #8b0000;
+}
+
+.card {
+  background: white;
+  padding: 25px;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(139, 0, 0, 0.08);
+  margin-bottom: 25px;
+}
+
+.form {
+  display: flex;
+  gap: 15px;
+  flex-wrap: wrap;
+}
+
+.form input,
+.form select {
+  padding: 10px;
+  border: 1px solid #f3caca;
+  border-radius: 8px;
+  width: 200px;
+}
+
+.form input:focus,
+.form select:focus {
+  outline: none;
+  border-color: #b31217;
+  box-shadow: 0 0 0 3px rgba(179, 18, 23, 0.15);
+}
+
+.addBtn {
+  background: linear-gradient(135deg, #b31217, #8b0000);
+  color: white;
+  border: none;
+  padding: 10px 18px;
+  border-radius: 8px;
+  cursor: pointer;
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  transition: 0.3s;
+}
+
+.addBtn:hover {
+  transform: translateY(-2px);
+}
+
+/* TABLE */
+.table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.table th,
+.table td {
+  padding: 14px;
+  border-bottom: 1px solid #f1d6d6;
+  text-align: left;
+}
+
+/* STATUS BADGES */
+.statusBadge {
+  padding: 6px 14px;
+  border-radius: 50px;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.available {
+  background: #e6f9ed;
+  color: #1e7e34;
+}
+
+.onTrip {
+  background: #ffe5e5;
+  color: #b31217;
+}
+
+.offDuty {
+  background: #f3f3f3;
+  color: #666;
+}
+
+/* ACTIONS */
+.actions {
+  display: flex;
+  gap: 10px;
+}
+
+.iconBtn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 15px;
+  transition: 0.3s;
+}
+
+.iconBtn:hover {
+  transform: scale(1.2);
+}
+
+.delete {
+  color: #b31217;
+}

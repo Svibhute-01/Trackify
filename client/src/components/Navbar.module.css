@@ -1,0 +1,171 @@
+/* =========================
+   NAVBAR CONTAINER
+========================= */
+.navbar {
+  height: 75px;
+  padding: 0 80px;
+  background: #ffffff;
+
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+
+  border-bottom: 1px solid #f1f1f1;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+
+  position: relative; /* required for mobile dropdown */
+}
+
+/* =========================
+   LOGO
+========================= */
+.logo {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  cursor: pointer;
+}
+
+.logo img {
+  width: 130px;
+  height: 130px;
+  object-fit: contain;
+}
+
+.logo span {
+  font-size: 20px;
+  font-weight: 600;
+  color: #e53935;
+}
+
+/* =========================
+   NAV LINKS (DESKTOP)
+========================= */
+.navLinks {
+  display: flex;
+  align-items: center;
+  gap: 40px;
+  list-style: none;
+}
+
+.navItem {
+  text-decoration: none;
+  color: #555;
+  font-weight: 500;
+  position: relative;
+  transition: all 0.3s ease;
+}
+
+.navItem:hover {
+  color: #e53935;
+}
+
+/* underline animation */
+.navItem::after {
+  content: "";
+  position: absolute;
+  width: 0%;
+  height: 2px;
+  background: #e53935;
+  left: 0;
+  bottom: -6px;
+  transition: 0.3s;
+}
+
+.navItem:hover::after {
+  width: 100%;
+}
+
+.active {
+  color: #e53935;
+}
+
+.active::after {
+  width: 100%;
+}
+
+/* =========================
+   BUTTONS
+========================= */
+.loginBtn {
+  padding: 10px 24px;
+  border-radius: 30px;
+  border: none;
+  background: #e53935;
+  color: white;
+  font-weight: 500;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+.loginBtn:hover {
+  background: #c62828;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 18px rgba(229, 57, 53, 0.25);
+}
+
+/* =========================
+   HAMBURGER
+========================= */
+.hamburger {
+  display: none;
+  font-size: 26px;
+  cursor: pointer;
+}
+
+/* Hide mobile login on desktop */
+.mobileOnly {
+  display: none;
+}
+
+/* =========================
+   MOBILE VIEW
+========================= */
+@media (max-width: 768px) {
+
+  .navbar {
+    padding: 0 30px;
+  }
+
+  .navLinks {
+    position: absolute;
+    top: 75px;
+    left: 0;
+    width: 100%;
+    background: white;
+
+    flex-direction: column;
+    align-items: center;
+    gap: 25px;
+    padding: 30px 0;
+
+    display: none;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+  }
+
+  .showMenu {
+    display: flex;
+  }
+
+  .hamburger {
+    display: block;
+  }
+
+  .loginBtn {
+    display: none;
+  }
+
+  .mobileOnly {
+    display: block;
+  }
+
+  .mobileLogin {
+    padding: 10px 22px;
+    border-radius: 25px;
+    border: none;
+    background: #e53935;
+    color: rgb(212, 20, 20);
+    font-weight: 500;
+    cursor: pointer;
+  }
+}

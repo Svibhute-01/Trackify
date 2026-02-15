@@ -1,0 +1,26 @@
+.card {
+  background: white;
+  padding: 20px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.06);
+  transition: 0.3s;
+}
+
+.card:hover {
+  transform: translateY(-5px);
+}
+
+.icon {
+  font-size: 28px;
+}
+
+/* Color Themes */
+.red {
+  border-left: 5px solid #da7275;
+}
+
+
+

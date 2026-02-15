@@ -1,0 +1,57 @@
+.container {
+  width: 240px;
+  background: linear-gradient(180deg, #d14a4f, #d81f1f);
+ /* Dark Red */
+  color: white;
+  height: 100vh;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+}
+
+
+
+.menu {
+  list-style: none;
+  padding: 0;
+  flex: 1;
+}
+
+.item {
+  padding: 12px 15px;
+  margin-bottom: 8px;
+  border-radius: 8px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  transition: all 0.3s ease;
+}
+
+.item:hover {
+  background: rgba(255, 255, 255, 0.15);
+}
+
+.active {
+  background: white;
+  color: #8b0000; /* Match red */
+  font-weight: 600;
+}
+
+.icon {
+  font-size: 16px;
+}
+
+.logout {
+  padding: 12px 15px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  border-radius: 8px;
+  transition: all 0.3s ease;
+}
+
+.logout:hover {
+  background: rgba(255, 255, 255, 0.15);
+}

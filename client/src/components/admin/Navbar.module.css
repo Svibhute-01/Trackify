@@ -1,0 +1,20 @@
+.container {
+  display: flex;
+  justify-content: space-between;
+  padding: 15px 20px;
+  background-color: #ffffff;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.search {
+  width: 300px;
+  padding: 8px;
+  border-radius: 30px;
+  border: 1px solid #d1d5db;
+}
+
+.admin {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}

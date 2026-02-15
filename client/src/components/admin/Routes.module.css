@@ -1,0 +1,211 @@
+.container {
+  padding: 30px;
+  background: #fff5f5;
+  min-height: 100vh;
+}
+
+.title {
+  margin-bottom: 20px;
+  font-size: 22px;
+  font-weight: 600;
+  color: #b71c1c;
+}
+
+.card {
+  background: white;
+  padding: 25px;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(183, 28, 28, 0.08);
+  margin-bottom: 25px;
+}
+
+/* FORM */
+.form {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 15px;
+}
+
+.form input,
+.form select {
+  padding: 10px;
+  border: 1px solid #ffcdd2;
+  border-radius: 6px;
+}
+
+.form input:focus,
+.form select:focus {
+  outline: none;
+  border-color: #d32f2f;
+}
+
+/* STOP SECTION */
+.stopSection {
+  display: flex;
+  gap: 8px;
+}
+
+.stopSection button {
+  background: #d32f2f;
+  border: none;
+  color: white;
+  padding: 8px 12px;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.stopSection button:hover {
+  background: #b71c1c;
+}
+
+.stopsList {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  width: 100%;
+}
+
+.stopItem {
+  background: #ffebee;
+  color: #c62828;
+  padding: 6px 10px;
+  border-radius: 20px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.stopDelete {
+  cursor: pointer;
+}
+
+/* SUBMIT */
+.submitBtn {
+  background: #d32f2f;
+  color: white;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.submitBtn:hover {
+  background: #b71c1c;
+}
+
+/* ROUTE CARD */
+.routeCard {
+  background: #fff;
+  border-radius: 12px;
+  padding: 20px;
+  margin-bottom: 25px;
+  box-shadow: 0 4px 12px rgba(183, 28, 28, 0.08);
+}
+
+/* TIMELINE */
+.timelineWrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 20px;
+  overflow-x: auto;
+  padding: 20px 0;
+}
+
+.timelineLine {
+  position: absolute;
+  top: 27px;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: #ffcdd2;
+  z-index: 1;
+}
+
+.timelineItem {
+  position: relative;
+  z-index: 2;
+  text-align: center;
+  min-width: 90px;
+}
+
+.dot {
+  width: 14px;
+  height: 14px;
+  background: #d32f2f;
+  border-radius: 50%;
+  margin: 0 auto 8px;
+  transition: 0.3s ease;
+}
+
+.startDot {
+  background: #2e7d32;
+}
+
+.endDot {
+  background: #2e7d32;
+}
+
+.dot:hover {
+  transform: scale(1.2);
+}
+
+.locationLabel {
+  font-size: 13px;
+  font-weight: 600;
+  color: #333;
+}
+
+.stopLabel {
+  font-size: 12px;
+  color: #666;
+}
+
+/* INFO */
+.routeInfo {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+/* STATUS */
+.activeStatus {
+  background: #e8f5e9;
+  color: #2e7d32;
+  padding: 6px 14px;
+  border-radius: 20px;
+  font-size: 13px;
+  font-weight: 500;
+}
+
+.inactiveStatus {
+  background: #ffebee;
+  color: #c62828;
+  padding: 6px 14px;
+  border-radius: 20px;
+  font-size: 13px;
+  font-weight: 500;
+}
+
+/* ACTIONS */
+.actions {
+  display: flex;
+  gap: 12px;
+}
+
+.icon {
+  cursor: pointer;
+  color: #d32f2f;
+}
+
+.icon:hover {
+  color: #b71c1c;
+}
+
+.empty {
+  text-align: center;
+  color: #888;
+  padding: 20px;
+}
