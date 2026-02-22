@@ -1,0 +1,68 @@
+.card {
+  background: #f4f4f6;
+  border-radius: 20px;
+  padding: 22px;
+  width: 320px;
+  height: 150px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  transition: 0.3s ease;
+}
+
+.card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.06);
+}
+
+.top {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: #444;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.icon {
+  background: #e8eefc;
+  color: #3b66f5;
+  padding: 6px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.middle {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+}
+
+.value {
+  font-size: 28px;
+  font-weight: 600;
+  color: #111;
+}
+
+.unit {
+  font-size: 14px;
+  color: #666;
+  font-weight: 500;
+}
+
+.subtitle {
+  background: #d9f6e5;
+  color: #16a34a;
+  font-size: 12px;
+  padding: 3px 8px;
+  border-radius: 8px;
+}
+
+.chartArea {
+  height: 40px;
+  display: flex;
+  align-items: flex-end;
+  gap: 6px;
+}

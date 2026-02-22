@@ -1,0 +1,25 @@
+.card {
+  background: #ffffff;
+  border-radius: 20px;
+  padding: 22px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.04);
+  transition: 0.25s ease;
+}
+
+.card:hover {
+  transform: translateY(-3px);
+}
+
+.cardHeader {
+  display: flex;
+  justify-content: space-between;
+  font-weight: 600;
+  font-size: 15px;
+  margin-bottom: 15px;
+  color: #111827;
+}
+
+.smallText {
+  font-size: 13px;
+  color: #6b7280;
+}
