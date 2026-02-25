@@ -1,54 +1,133 @@
-.card {
-  background: #ffffff;
-  border-radius: 20px;
-  padding: 25px;
-  min-height: 160px;
+.dashboard {
+  padding: 30px;
   display: flex;
   flex-direction: column;
-  justify-content: space-between;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.04);
-  transition: all 0.25s ease;
+  gap: 24px;
+  background: #f4f5f7;
+  min-height: 100vh;
 }
 
-.card:hover {
-  transform: translateY(-4px);
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+/* ===================== */
+/* TOP STATS SECTION */
+/* ===================== */
+
+.statsRow {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 20px;
 }
 
-.top {
+/* ===================== */
+/* MAIN GRID SECTION */
+/* ===================== */
+
+.mainGrid {
+  display: grid;
+  grid-template-columns: 250px 1fr 1.2fr;
+  gap: 20px;
+  align-items: stretch;
+}
+
+.leftColumn {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+/* ===================== */
+/* MINI BAR CHART */
+/* ===================== */
+
+.miniBarChart {
+  display: flex;
+  gap: 4px;
+  align-items: flex-end;
+}
+
+.bar {
+  width: 6px;
+  background: #3b66f5;
+  border-radius: 4px;
+}
+
+/* ===================== */
+/* CIRCULAR PROGRESS */
+/* ===================== */
+
+.circularWrapper {
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  background: conic-gradient(#84cc16 70%, #e5e7eb 0%);
   display: flex;
   align-items: center;
-  gap: 10px;
-  font-weight: 600;
-  font-size: 14px;
-  color: #374151;
+  justify-content: center;
 }
 
-.icon {
-  background: #eef2ff;
-  color: #3b66f5;
-  padding: 8px;
-  border-radius: 10px;
+.circularInner {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: #ffffff;
 }
 
-.value {
-  font-size: 30px;
-  font-weight: 700;
-  color: #111827;
+/* ================================================= */
+/* ================= RESPONSIVE ==================== */
+/* ================================================= */
+
+/* ---------- Large Tablet ---------- */
+@media (max-width: 1200px) {
+  .mainGrid {
+    grid-template-columns: 220px 1fr;
+  }
 }
 
-.unit {
-  font-size: 15px;
-  color: #6b7280;
-  margin-left: 5px;
+/* ---------- Tablet ---------- */
+@media (max-width: 992px) {
+  .statsRow {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .mainGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .leftColumn {
+    flex-direction: row;
+  }
+
+  .leftColumn > * {
+    flex: 1;
+  }
 }
 
-.subtitle {
-  background: #dcfce7;
-  color: #16a34a;
-  font-size: 12px;
-  padding: 4px 10px;
-  border-radius: 10px;
-  font-weight: 500;
-  margin-left: 10px;
+/* ---------- Small Tablet ---------- */
+@media (max-width: 768px) {
+  .dashboard {
+    padding: 20px;
+  }
+
+  .statsRow {
+    grid-template-columns: 1fr;
+  }
+
+  .leftColumn {
+    flex-direction: column;
+  }
+}
+
+/* ---------- Mobile ---------- */
+@media (max-width: 576px) {
+  .dashboard {
+    padding: 15px;
+    gap: 18px;
+  }
+
+  .statsRow {
+    gap: 15px;
+  }
+
+  .mainGrid {
+    gap: 15px;
+  }
 }

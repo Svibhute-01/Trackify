@@ -1,36 +1,32 @@
 import React from "react";
-import styles from "./DashboardBottom.module.css";
+import styles from "./CalendarCard.module.css";
+import { FiArrowUpRight } from "react-icons/fi";
 
 const CalendarCard = () => {
-  const days = Array(21).fill(0);
+  const days = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
+
+  const activeDays = [2, 4, 9, 11]; // highlighted boxes
 
   return (
     <div className={styles.card}>
-      <div className={styles.cardHeader}>
-        <span>Calendar</span>
-        ↗
+      <div className={styles.header}>
+        <h3>Calendar</h3>
+        <FiArrowUpRight className={styles.icon} />
       </div>
 
-      <div
-        style={{
-          display: "grid",
-          gridTemplateColumns: "repeat(7, 1fr)",
-          gap: "8px",
-        }}
-      >
-        {days.map((_, i) => (
+      <div className={styles.weekDays}>
+        {days.map((day, i) => (
+          <span key={i}>{day}</span>
+        ))}
+      </div>
+
+      <div className={styles.grid}>
+        {Array.from({ length: 14 }).map((_, i) => (
           <div
             key={i}
-            style={{
-              height: "18px",
-              borderRadius: "4px",
-              background:
-                i % 5 === 0
-                  ? "#3b66f5"
-                  : i % 4 === 0
-                  ? "#84cc16"
-                  : "#dbeafe",
-            }}
+            className={`${styles.day} ${
+              activeDays.includes(i) ? styles.active : ""
+            }`}
           />
         ))}
       </div>

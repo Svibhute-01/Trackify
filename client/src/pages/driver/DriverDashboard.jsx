@@ -1,89 +1,88 @@
 import React from "react";
+import styles from "./DriverDashboard.module.css";
+
 import StatsCard from "../../components/driver/StatsCard";
-import { FiPercent, FiNavigation, FiClock } from "react-icons/fi";
 import CalendarCard from "../../components/driver/CalendarCard";
 import RatingCard from "../../components/driver/RatingCard";
 import CurrentTripCard from "../../components/driver/CurrentTripCard";
 import MapCard from "../../components/driver/MapCard";
-import stylesBottom from "../../components/driver/DashboardBottom.module.css";
 
+import { FiPercent, FiNavigation, FiClock } from "react-icons/fi";
+
+/* ================= Mini Bar Chart ================= */
 const MiniBarChart = ({ bars }) => {
   return (
-    <>
+    <div className={styles.miniBarChart}>
       {bars.map((h, i) => (
         <div
           key={i}
-          style={{
-            width: "6px",
-            height: h,
-            background: "#3b66f5",
-            borderRadius: "4px",
-          }}
+          className={styles.bar}
+          style={{ height: h }}
         />
       ))}
-    </>
-  );
-};
-
-const CircularProgress = () => {
-  return (
-    <div
-      style={{
-        width: 60,
-        height: 60,
-        borderRadius: "50%",
-        background:
-          "conic-gradient(#84cc16 70%, #e5e7eb 0%)",
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "center",
-      }}
-    >
-      <div
-        style={{
-          width: 40,
-          height: 40,
-          borderRadius: "50%",
-          background: "#f4f4f6",
-        }}
-      />
     </div>
   );
 };
+
+/* ================= Circular Progress ================= */
+const CircularProgress = () => {
+  return (
+    <div className={styles.circularWrapper}>
+      <div className={styles.circularInner} />
+    </div>
+  );
+};
+
+/* ================= Main Dashboard ================= */
 
 const DriverDashboard = () => {
   return (
-    <div style={{ display: "flex", gap: "25px" }}>
-      
-      <StatsCard
-        icon={<FiPercent />}
-        title="Total trips"
-        value="84"
-        subtitle="+2.1% this month"
-        chart={<MiniBarChart bars={[15, 25, 18, 35, 20]} />}
-      />
+    <div className={styles.dashboard}>
 
-      <StatsCard
-        icon={<FiNavigation />}
-        title="Distance driven"
-        value="1628"
-        unit="km"
-        chart={<MiniBarChart bars={[20, 28, 30, 22, 34]} />}
-      />
+      {/* ======= TOP STATS SECTION ======= */}
+      <div className={styles.statsRow}>
+        <StatsCard
+          icon={<FiPercent />}
+          title="Total trips"
+          value="84"
+          subtitle="+2.1% this month"
+          chart={<MiniBarChart bars={[15, 25, 18, 35, 20]} />}
+        />
 
-      <StatsCard
-        icon={<FiClock />}
-        title="Driving hours"
-        value="16 hr 12"
-        unit="m"
-        chart={<CircularProgress />}
-      />
+        <StatsCard
+          icon={<FiNavigation />}
+          title="Distance driven"
+          value="1628"
+          unit="km"
+          chart={<MiniBarChart bars={[20, 28, 30, 22, 34]} />}
+        />
 
-      
+        <StatsCard
+          icon={<FiClock />}
+          title="Driving hours"
+          value="16 hr 12"
+          unit="m"
+          chart={<CircularProgress />}
+        />
+      </div>
 
-      
+      {/* ======= MAIN GRID SECTION ======= */}
+      <div className={styles.mainGrid}>
+        
+        {/* Left Column */}
+        <div className={styles.leftColumn}>
+          <CalendarCard />
+          <RatingCard />
+        </div>
+
+        {/* Middle Column */}
+        <CurrentTripCard />
+
+        {/* Right Column */}
+        <MapCard />
+
+      </div>
     </div>
-    
   );
 };
 

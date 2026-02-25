@@ -1,0 +1,46 @@
+.card {
+  background: white;
+  border-radius: 16px;
+  padding: 20px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  height: 100%;
+}
+
+.title {
+  margin: 0 0 16px 0;
+  font-size: 16px;
+  font-weight: 600;
+  color: #1a1f36;
+}
+
+.ratingContainer {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 8px;
+}
+
+.ratingNumber {
+  font-size: 28px;
+  font-weight: 700;
+  color: #1a1f36;
+}
+
+.stars {
+  display: flex;
+  gap: 4px;
+  font-size: 20px;
+}
+
+.starFilled {
+  color: #fbbf24;
+}
+
+.starEmpty {
+  color: #e2e8f0;
+}
+
+.totalRatings {
+  font-size: 13px;
+  color: #718096;
+}

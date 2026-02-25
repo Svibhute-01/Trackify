@@ -1,0 +1,52 @@
+.card {
+  background: #ffffff;
+  border-radius: 20px;
+  padding: 20px;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.05);
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+}
+
+.header h3 {
+  font-size: 18px;
+  font-weight: 600;
+}
+
+.icon {
+  font-size: 16px;
+  color: #9ca3af;
+  cursor: pointer;
+}
+
+.weekDays {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  font-size: 12px;
+  color: #9ca3af;
+  margin-bottom: 10px;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 8px;
+}
+
+.day {
+  height: 26px;
+  border-radius: 6px;
+  background: #f1f5f9;
+}
+
+.active {
+  background: #3b66f5;
+}
+
+.active:nth-child(odd) {
+  background: #84cc16;
+}
