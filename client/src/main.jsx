@@ -4,11 +4,16 @@ import { createBrowserRouter, RouterProvider } from "react-router-dom";
 
 import DriverLayout from "./pages/driver/DriverLayout";
 import DriverDashboard from "./pages/driver/DriverDashboard";
+import AdminLayout  from "./pages/admin/AdminLayout.jsx"
 import App from "./App.jsx";
 
 const router = createBrowserRouter([
   {path:"/",
     element:<App></App>
+  },
+  {path:"/admin",
+    element:<AdminLayout/>
+
   },
   {
     path: "/driver",

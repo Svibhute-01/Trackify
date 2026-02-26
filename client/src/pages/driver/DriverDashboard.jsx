@@ -6,6 +6,7 @@ import CalendarCard from "../../components/driver/CalendarCard";
 import RatingCard from "../../components/driver/RatingCard";
 import CurrentTripCard from "../../components/driver/CurrentTripCard";
 import MapCard from "../../components/driver/MapCard";
+import ScheduleTripCard from "../../components/driver/ScheduleTripCard";
 
 import { FiPercent, FiNavigation, FiClock } from "react-icons/fi";
 
@@ -14,11 +15,7 @@ const MiniBarChart = ({ bars }) => {
   return (
     <div className={styles.miniBarChart}>
       {bars.map((h, i) => (
-        <div
-          key={i}
-          className={styles.bar}
-          style={{ height: h }}
-        />
+        <div key={i} className={styles.bar} style={{ height: h }} />
       ))}
     </div>
   );
@@ -80,8 +77,13 @@ const DriverDashboard = () => {
 
         {/* Right Column */}
         <MapCard />
-
       </div>
+
+      {/* ======= FULL WIDTH SECTION ======= */}
+      <div className={styles.fullWidthSection}>
+        <ScheduleTripCard />
+      </div>
+
     </div>
   );
 };

@@ -23,11 +23,11 @@
 
 .mainGrid {
   display: grid;
-  grid-template-columns: 250px 1fr 1.2fr;
-  gap: 20px;
-  align-items: stretch;
-}
+  grid-template-columns: 320px minmax(0, 1fr) minmax(0, 1.2fr);
+  gap: 24px;
 
+  align-items: start;   /* THIS FIXES IT */
+}
 .leftColumn {
   display: flex;
   flex-direction: column;
@@ -130,4 +130,33 @@
   .mainGrid {
     gap: 15px;
   }
+}
+
+
+.dashboard {
+  padding: 24px;
+}
+
+.statsRow {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 24px;
+  margin-bottom: 24px;
+}
+
+.mainGrid {
+  display: grid;
+  grid-template-columns: 320px minmax(0, 1fr) minmax(0, 1.2fr);
+  gap: 24px;
+  align-items: start; /* VERY IMPORTANT */
+}
+
+.leftColumn {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.fullWidthSection {
+  margin-top: 24px;
 }
