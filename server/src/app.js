@@ -32,6 +32,12 @@ import routeRouter from "./routes/route.route.js";
 
 app.use("/api/v1/routes", routeRouter);
 
+import scheduleRoutes from "./routes/schedule.routes.js";
+
+app.use("/api/schedules", scheduleRoutes);
+
+
+
 // Health check route (very useful)
 app.get("/", (req, res) => {
   res.send("Trackify API is running 🚍");
