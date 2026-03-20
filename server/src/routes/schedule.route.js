@@ -8,27 +8,21 @@ import {
   deleteSchedule
 } from "../controllers/schedule.controller.js";
 
+import { protect, authorize } from "../middleware/authMiddleware.js";
+
 const router = express.Router();
 
+// Create schedule → Admin only
+router.post("/", protect, authorize("admin"), createSchedule);
 
-// Create schedule
-router.post("/", createSchedule);
+// Get all schedules → Logged-in users
+router.get("/", protect, getAllSchedules);
 
+// Get single schedule → Logged-in users
+router.get("/:id", protect, getScheduleById);
 
-// Get all schedules
-router.get("/", getAllSchedules);
+// Update schedule → Admin only
+router.put("/:id", protect, authorize("admin"), updateSchedule);
 
-
-// Get single schedule
-router.get("/:id", getScheduleById);
-
-
-// Update schedule
-router.put("/:id", updateSchedule);
-
-
-// Delete schedule
-router.delete("/:id", deleteSchedule);
-
-
-export default router;
+// Delete schedule → Admin only
+router.delete("/:id", protect, authorize("admin"), deleteSchedule);

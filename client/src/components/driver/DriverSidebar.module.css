@@ -1,7 +1,7 @@
 .sidebar {
   width: 250px;
   height: 100vh;
-  background: #f4f4f6;
+  background: linear-gradient(180deg, #d14a4f, #d81f1f);
   display: flex;
   flex-direction: column;
   justify-content: space-between;
@@ -35,7 +35,7 @@
   padding: 10px 12px;
   border-radius: 10px;
   cursor: pointer;
-  color: #333;
+  color:white;
   font-size: 14px;
   transition: 0.3s;
   position: relative;
@@ -43,6 +43,7 @@
 
 .menuItem:hover {
   background: #e9e9ef;
+  color: #d80541;
 }
 
 .active {

@@ -7,12 +7,15 @@ import {
   deleteRoute
 } from "../controllers/route.controller.js";
 
+import { protect, authorize } from "../middleware/authMiddleware.js";
+
 const router = express.Router();
+router.post("/add", protect, authorize("admin"), addRoute);
 
-router.post("/add", addRoute);
-router.get("/", getAllRoutes);
-router.get("/:id", getRouteById);
-router.put("/:id", updateRoute);
-router.delete("/:id", deleteRoute);
+router.get("/", protect, getAllRoutes);
 
-export default router;
+router.get("/:id", protect, getRouteById);
+
+router.put("/:id", protect, authorize("admin"), updateRoute);
+
+router.delete("/:id", protect, authorize("admin"), deleteRoute);

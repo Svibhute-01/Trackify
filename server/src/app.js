@@ -32,7 +32,7 @@ import routeRouter from "./routes/route.route.js";
 
 app.use("/api/v1/routes", routeRouter);
 
-import scheduleRoutes from "./routes/schedule.routes.js";
+import scheduleRoutes from "./routes/schedule.route.js";
 
 app.use("/api/schedules", scheduleRoutes);
 
