@@ -1,21 +1,21 @@
 import { useState } from "react";
-import { NavLink } from "react-router-dom";
+import { NavLink, useNavigate } from "react-router-dom";
 import styles from "./Navbar.module.css";
-import logo from "../assets/logo.png"; // adjust path if needed
+import logo from "../assets/logo.png";
 
 function Navbar() {
   const [menuOpen, setMenuOpen] = useState(false);
+  const navigate = useNavigate();
 
   return (
     <nav className={styles.navbar}>
       
       {/* LOGO */}
-      <div className={styles.logo}>
+      <div className={styles.logo} onClick={() => navigate("/")}>
         <img src={logo} alt="Trackify Logo" />
-       
       </div>
 
-      {/* HAMBURGER ICON */}
+      {/* HAMBURGER */}
       <div
         className={styles.hamburger}
         onClick={() => setMenuOpen(!menuOpen)}
@@ -24,18 +24,13 @@ function Navbar() {
       </div>
 
       {/* NAV LINKS */}
-      <ul
-        className={`${styles.navLinks} ${
-          menuOpen ? styles.showMenu : ""
-        }`}
-      >
+      <ul className={`${styles.navLinks} ${menuOpen ? styles.showMenu : ""}`}>
+        
         <li>
           <NavLink
             to="/"
-            className={({ isActive }) =>
-              isActive ? `${styles.navItem} ${styles.active}` : styles.navItem
-            }
             onClick={() => setMenuOpen(false)}
+            className={styles.navItem}
           >
             Home
           </NavLink>
@@ -44,10 +39,8 @@ function Navbar() {
         <li>
           <NavLink
             to="/track"
-            className={({ isActive }) =>
-              isActive ? `${styles.navItem} ${styles.active}` : styles.navItem
-            }
             onClick={() => setMenuOpen(false)}
+            className={styles.navItem}
           >
             Track Bus
           </NavLink>
@@ -56,10 +49,8 @@ function Navbar() {
         <li>
           <NavLink
             to="/routes"
-            className={({ isActive }) =>
-              isActive ? `${styles.navItem} ${styles.active}` : styles.navItem
-            }
             onClick={() => setMenuOpen(false)}
+            className={styles.navItem}
           >
             Routes
           </NavLink>
@@ -68,23 +59,29 @@ function Navbar() {
         <li>
           <NavLink
             to="/favorites"
-            className={({ isActive }) =>
-              isActive ? `${styles.navItem} ${styles.active}` : styles.navItem
-            }
             onClick={() => setMenuOpen(false)}
+            className={styles.navItem}
           >
             Favorites
           </NavLink>
         </li>
 
-        {/* Mobile Login */}
+        {/* 📱 Mobile Login */}
         <li className={styles.mobileOnly}>
-          <button className={styles.mobileLogin}>Login</button>
+          <NavLink
+            to="/login"
+            className={styles.mobileLogin}
+            onClick={() => setMenuOpen(false)}
+          >
+            Login
+          </NavLink>
         </li>
       </ul>
 
-      {/* Desktop Login */}
-      <button className={styles.loginBtn}>Login</button>
+      {/* 💻 Desktop Login */}
+      <NavLink to="/login" className={styles.loginBtn}>
+        Login
+      </NavLink>
     </nav>
   );
 }

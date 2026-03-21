@@ -8,7 +8,8 @@ import {
   deleteSchedule
 } from "../controllers/schedule.controller.js";
 
-import { protect, authorize } from "../middleware/authMiddleware.js";
+import { protect} from "../middleware/auth.middleware.js";
+import { authorize } from "../middleware/authorize.middleware.js";
 
 const router = express.Router();
 
@@ -26,3 +27,4 @@ router.put("/:id", protect, authorize("admin"), updateSchedule);
 
 // Delete schedule → Admin only
 router.delete("/:id", protect, authorize("admin"), deleteSchedule);
+export default router;

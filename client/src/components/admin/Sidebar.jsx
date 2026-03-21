@@ -12,31 +12,34 @@ import {
   FaSignOutAlt,
 } from "react-icons/fa";
 
-function Sidebar({ selectedtab, setselectedtab }) {
+import { useNavigate, useLocation } from "react-router-dom";
+
+function Sidebar() {
+  const navigate = useNavigate();
+  const location = useLocation();
+
   const menuItems = [
-    { name: "Dashboard", icon: <FaTachometerAlt /> },
-    { name: "Buses", icon: <FaBus /> },
-    { name: "Drivers", icon: <FaUserTie /> },
-    { name: "Routes", icon: <FaRoute /> },
-    { name: "Schedules", icon: <FaCalendarAlt /> },
-    { name: "Users", icon: <FaUsers /> },
-    { name: "Reports", icon: <FaChartBar /> },
-    { name: "Notifications", icon: <FaBell /> },
-    { name: "Settings", icon: <FaCog /> },
+    { name: "Dashboard", icon: <FaTachometerAlt />, path: "/admin" },
+    { name: "Buses", icon: <FaBus />, path: "/admin/add-bus" },
+    { name: "Drivers", icon: <FaUserTie />, path: "/admin/add-driver" },
+    { name: "Routes", icon: <FaRoute />, path: "/admin/add-route" },
+    { name: "Schedules", icon: <FaCalendarAlt />, path: "/admin/schedule-bus" },
+    { name: "Users", icon: <FaUsers />, path: "/admin/users" },
+    { name: "Reports", icon: <FaChartBar />, path: "/admin/reports" },
+    { name: "Notifications", icon: <FaBell />, path: "/admin/notifications" },
+    { name: "Settings", icon: <FaCog />, path: "/admin/settings" },
   ];
 
   return (
     <div className={styles.container}>
-      
-
       <ul className={styles.menu}>
         {menuItems.map((item) => (
           <li
             key={item.name}
             className={`${styles.item} ${
-              selectedtab === item.name ? styles.active : ""
+              location.pathname === item.path ? styles.active : ""
             }`}
-            onClick={() => setselectedtab(item.name)}
+            onClick={() => navigate(item.path)}
           >
             <span className={styles.icon}>{item.icon}</span>
             <span>{item.name}</span>
@@ -44,7 +47,13 @@ function Sidebar({ selectedtab, setselectedtab }) {
         ))}
       </ul>
 
-      <div className={styles.logout}>
+      <div
+        className={styles.logout}
+        onClick={() => {
+          // later: clear JWT token
+          navigate("/");
+        }}
+      >
         <FaSignOutAlt className={styles.icon} />
         Logout
       </div>

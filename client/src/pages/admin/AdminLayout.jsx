@@ -7,27 +7,28 @@ import styles from "./AdminLayout.module.css";
 import Schedule from "../../components/admin/Schedule";
 import Routes from "../../components/admin/Routes";
 import { useState } from "react";
+import { Outlet } from "react-router-dom";
 
 function AdminLayout() {
   const [selectedtab, setselectedtab] = useState("Dashboard");
 
   // Function to render content based on sidebar selection
-  const renderContent = () => {
-    switch (selectedtab) {
-      case "Dashboard":
-        return <Dashboard />;
-      case "Buses":
-        return <Buses />;
-      case "Drivers":
-        return <Drivers/>
-      case "Routes":
-         return <Routes />;
-         case "Schedules":
-         return <Schedule />;
-      default:
-        return <Dashboard />;
-    }
-  };
+  // const renderContent = () => {
+  //   switch (selectedtab) {
+  //     case "Dashboard":
+  //       return <Dashboard />;
+  //     case "Buses":
+  //       return <Buses />;
+  //     case "Drivers":
+  //       return <Drivers/>
+  //     case "Routes":
+  //        return <Routes />;
+  //        case "Schedules":
+  //        return <Schedule />;
+  //     default:
+  //       return <Dashboard />;
+  //   }
+  // };
 
   return (
     <div className={styles.container}>
@@ -35,7 +36,8 @@ function AdminLayout() {
 
       <div className={styles.mainSection}>
         <Navbar />
-        {renderContent()} {/* Render dynamic section here */}
+        {/* {renderContent()} Render dynamic section here */}
+        <Outlet/>
       </div>
     </div>
   );

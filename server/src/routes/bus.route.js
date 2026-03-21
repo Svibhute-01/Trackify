@@ -14,3 +14,4 @@ router.get("/:id", protect, getBusById);
 router.put("/:id", protect, authorize("admin"), updateBus);
 
 router.delete("/:id", protect, authorize("admin"), deleteBus);
+export default router;
