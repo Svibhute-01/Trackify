@@ -1,6 +1,6 @@
-import User from "../models/User.js";
+import {User} from "../models/user.model.js";
 import bcrypt from "bcryptjs";
-import generateJWTtoken from "../config/jwt.js";
+import generateJWTtoken from "../config/jwt.config.js";
 
 
 // ================= REGISTER =================

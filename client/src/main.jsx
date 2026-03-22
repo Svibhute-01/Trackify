@@ -13,6 +13,7 @@ import Schedule from "./components/admin/Schedule.jsx";
 import Dashboard from "./pages/admin/Dashboard.jsx";
 import Login from "./pages/login.jsx";
 import Register from "./pages/register.jsx";
+import ProtectedRoute from "./components/protectedRoute.jsx";
 const router = createBrowserRouter([
   {path:"/",
     element:<App></App>
@@ -25,32 +26,36 @@ const router = createBrowserRouter([
     path: "/register",
     element: <Register />
   },
-  {path:"/admin",
-    element:<AdminLayout/>,
-    children:[
-       {
-      index: true,   // 👈 THIS FIXES IT
-      element: <Dashboard></Dashboard> // or your Dashboard component
+  {
+  path: "/admin",
+  element: (
+    <ProtectedRoute>
+      <AdminLayout />
+    </ProtectedRoute>
+  ),
+  children: [
+    {
+      index: true,
+      element: <Dashboard />
     },
-      {
-        path:"add-bus",
-        element:<Buses></Buses>
-      },
-      {
-        path:"add-driver",
-        element:<Drivers></Drivers>
-      },
-      {
-        path:"add-route",
-        element:<Routes></Routes>
-      },
-      {
-        path:"schedule-bus",
-        element:<Schedule></Schedule>
-      }
-    ]
-
-  },
+    {
+      path: "add-bus",
+      element: <Buses />
+    },
+    {
+      path: "add-driver",
+      element: <Drivers />
+    },
+    {
+      path: "add-route",
+      element: <Routes />
+    },
+    {
+      path: "schedule-bus",
+      element: <Schedule />
+    }
+  ]
+},
   {
     path: "/driver",
     element: <DriverLayout />,

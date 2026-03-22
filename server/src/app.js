@@ -13,7 +13,7 @@ app.use(express.static("public"));
 // CORS configuration
 const allowedOrigins = process.env.CORS_ORIGIN
   ? process.env.CORS_ORIGIN.split(";")
-  : ["http://localhost:4000"];
+  : ["http://localhost:5173"];
 
 app.use(
   cors({
@@ -35,6 +35,9 @@ app.use("/api/v1/routes", routeRouter);
 import scheduleRoutes from "./routes/schedule.route.js";
 
 app.use("/api/schedules", scheduleRoutes);
+import authRoute from "./routes/auth.routes.js"
+app.use("/auth",authRoute);
+
 
 
 
