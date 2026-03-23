@@ -7,16 +7,23 @@ const busSchema = new mongoose.Schema(
       required: true,
       unique: true,
       trim: true,
-      uppercase: true
+      uppercase: true,
     },
 
     status: {
       type: String,
-      enum: ["active", "inactive", "on_trip"],
-      default: "inactive"
-    }
+      enum: ["Active", "Inactive", "On Trip"],
+      default: "inactive",
+    },
+
+    capacity: {
+      type: Number,
+      required: true,
+      min: 1,
+    },
   },
-  { timestamps: true }
+
+  { timestamps: true },
 );
 
 export const Bus = mongoose.model("Bus", busSchema);

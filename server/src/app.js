@@ -24,19 +24,19 @@ app.use(
 );
 
 // Routes
-import busRouter from "./routes/bus.route.js";
+import authRoute from "./routes/auth.routes.js"
+app.use("/auth",authRoute);
 
-app.use("/api/v1/buses", busRouter);
+import busRouter from "./routes/bus.route.js";
+app.use("/buses", busRouter);
 
 import routeRouter from "./routes/route.route.js";
-
 app.use("/api/v1/routes", routeRouter);
 
 import scheduleRoutes from "./routes/schedule.route.js";
-
 app.use("/api/schedules", scheduleRoutes);
-import authRoute from "./routes/auth.routes.js"
-app.use("/auth",authRoute);
+
+
 
 
 

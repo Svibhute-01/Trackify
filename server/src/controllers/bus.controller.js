@@ -1,20 +1,36 @@
 import { Bus } from "../models/bus.model.js";
-export const addBus=async(req,res)=>{
-    try{
-       const bus= await Bus.create(req.body);
+export const addBus = async (req, res) => {
+  try {
+    const { numberPlate, capacity, status } = req.body;
 
-        res.status(201).json({
-            success:true,
-            message:"Bus added Successfully",
-            data:bus,
-        });
-    }catch(error){
-        res.status(500).json({
-            success:false,
-            message:error.message
-        });
-
+    if (!numberPlate || !capacity) {
+      return res.status(400).json({
+        success: false,
+        message: "Number Plate and Capacity are required",
+      });
     }
+
+    req.body.numberPlate = numberPlate.toUpperCase();
+
+    const bus = await Bus.create(req.body);
+
+    res.status(201).json({
+      success: true,
+      message: "Bus added Successfully",
+      data: bus,
+    });
+  } catch (error) {
+    if (error.code === 11000) {
+      return res.status(400).json({
+        success: false,
+        message: "Bus with this Number Plate already exists",
+      });
+    }
+    res.status(500).json({
+      success: false,
+      message: error.message,
+    });
+  }
 };
 
 
