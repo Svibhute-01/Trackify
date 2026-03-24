@@ -1,25 +1,26 @@
 import { useState, useEffect } from "react";
-
 import styles from "./Buses.module.css";
 import API from "../../api/api";
-import { useNavigate } from "react-router-dom";
 import { FaPlus, FaTrash, FaEdit } from "react-icons/fa";
 
 function Buses() {
-  const navigate = useNavigate();
-
   // State
   const [buses, setBuses] = useState([]);
   const [numberPlate, setNumberPlate] = useState("");
   const [capacity, setCapacity] = useState("");
   const [status, setStatus] = useState("Inactive");
   const [loading, setLoading] = useState(false);
+  const [editingId, setEditingId] = useState(null);
 
-  // Fetch buses from backend
+  // 🔥 FETCH BUSES
   const fetchBuses = async () => {
     try {
       const res = await API.get("/buses");
-      setBuses(res.data.data); // assuming backend returns array of buses
+      const data = Array.isArray(res.data)
+        ? res.data
+        : res.data.data;
+
+      setBuses(data || []);
     } catch (err) {
       console.error(err);
       alert("Could not fetch buses");
@@ -30,7 +31,7 @@ function Buses() {
     fetchBuses();
   }, []);
 
-  // Add Bus
+  // 🔥 ADD / UPDATE BUS
   const handleSubmit = async (e) => {
     e.preventDefault();
 
@@ -40,26 +41,57 @@ function Buses() {
     }
 
     setLoading(true);
-    try {
-      const res = await API.post("/buses/add", {
-        numberPlate: numberPlate.toUpperCase(),
-        capacity: Number(capacity),
-        status,
-      });
 
-      alert("Bus added successfully!");
-      // Clear form
+    const payload = {
+      numberPlate: numberPlate.toUpperCase(),
+      capacity: Number(capacity),
+      status,
+    };
+
+    try {
+      if (editingId) {
+        // UPDATE
+        await API.put(`/buses/${editingId}`, payload);
+        alert("Bus updated successfully!");
+      } else {
+        // CREATE
+        await API.post("/buses/add", payload);
+        alert("Bus added successfully!");
+      }
+
+      // RESET FORM
       setNumberPlate("");
       setCapacity("");
       setStatus("Inactive");
+      setEditingId(null);
 
-      // Refresh buses list
       fetchBuses();
     } catch (error) {
       console.error(error.response?.data);
-      alert(error.response?.data?.message || "Could not add bus..");
+      alert(error.response?.data?.message || "Operation failed");
     } finally {
       setLoading(false);
+    }
+  };
+
+  // 🔥 EDIT BUS
+  const handleEdit = (bus) => {
+    setNumberPlate(bus.numberPlate);
+    setCapacity(bus.capacity);
+    setStatus(bus.status);
+    setEditingId(bus._id);
+  };
+
+  // 🔥 DELETE BUS
+  const handleDelete = async (id) => {
+    if (!window.confirm("Delete this bus?")) return;
+
+    try {
+      await API.delete(`/buses/${id}`);
+      setBuses(buses.filter((bus) => bus._id !== id));
+    } catch (err) {
+      console.error(err);
+      alert("Delete failed");
     }
   };
 
@@ -77,7 +109,7 @@ function Buses() {
 
       {/* Add Bus Card */}
       <div className={styles.card}>
-        <h3>Add New Bus</h3>
+        <h3>{editingId ? "Edit Bus" : "Add New Bus"}</h3>
 
         <form className={styles.form} onSubmit={handleSubmit}>
           <div className={styles.inputGroup}>
@@ -104,7 +136,10 @@ function Buses() {
 
           <div className={styles.inputGroup}>
             <label>Status</label>
-            <select value={status} onChange={(e) => setStatus(e.target.value)}>
+            <select
+              value={status}
+              onChange={(e) => setStatus(e.target.value)}
+            >
               <option value="Active">Active</option>
               <option value="Inactive">Inactive</option>
               <option value="On Trip">On Trip</option>
@@ -112,7 +147,14 @@ function Buses() {
           </div>
 
           <button type="submit" className={styles.addBtn} disabled={loading}>
-            <FaPlus /> {loading ? "Adding..." : "Add Bus"}
+            <FaPlus />{" "}
+            {loading
+              ? editingId
+                ? "Updating..."
+                : "Adding..."
+              : editingId
+              ? "Update Bus"
+              : "Add Bus"}
           </button>
         </form>
       </div>
@@ -128,35 +170,45 @@ function Buses() {
               <th>Number Plate</th>
               <th>Capacity</th>
               <th>Status</th>
+              <th>Actions</th>
             </tr>
           </thead>
+
           <tbody>
-  {buses.map((bus, index) => (
-    <tr key={bus.id || index}>
-      <td>{index + 1}</td>
+            {buses.map((bus, index) => (
+              <tr key={bus._id || index}>
+                <td>{index + 1}</td>
                 <td className={styles.plate}>{bus.numberPlate}</td>
                 <td>{bus.capacity}</td>
+
                 <td>
                   <span
-                    className={`${styles.statusBadge} ${getStatusClass(bus.status)}`}
+                    className={`${styles.statusBadge} ${getStatusClass(
+                      bus.status
+                    )}`}
                   >
                     {bus.status}
                   </span>
                 </td>
 
-      {/* ✅ Actions Column */}
-      <td className={styles.actions}>
-        <button className={styles.iconBtn}>
-          <FaEdit />
-        </button>
+                <td className={styles.actions}>
+                  <button
+                    className={styles.iconBtn}
+                    onClick={() => handleEdit(bus)}
+                  >
+                    <FaEdit />
+                  </button>
 
-        <button className={`${styles.iconBtn} ${styles.delete}`}>
-          <FaTrash />
-        </button>
-      </td>
-    </tr>
-  ))}
-</tbody>
+                  <button
+                    className={`${styles.iconBtn} ${styles.delete}`}
+                    onClick={() => handleDelete(bus._id)}
+                  >
+                    <FaTrash />
+                  </button>
+                </td>
+              </tr>
+            ))}
+          </tbody>
         </table>
       </div>
     </div>
