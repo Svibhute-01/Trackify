@@ -31,10 +31,12 @@ import busRouter from "./routes/bus.route.js";
 app.use("/buses", busRouter);
 
 import routeRouter from "./routes/route.route.js";
-app.use("/api/v1/routes", routeRouter);
+app.use("/routes", routeRouter);
 
 import scheduleRoutes from "./routes/schedule.route.js";
-app.use("/api/schedules", scheduleRoutes);
+app.use("/schedules", scheduleRoutes);
+import driverRoutes from "./routes/driver.route.js";
+app.use("/drivers", driverRoutes);
 
 
 

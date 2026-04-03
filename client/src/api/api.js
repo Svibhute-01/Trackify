@@ -1,12 +1,18 @@
-// Example
 import axios from "axios";
 
-const token = localStorage.getItem("token"); // your JWT token
 const API = axios.create({
   baseURL: "http://localhost:4000",
-  headers: {
-    Authorization: `Bearer ${token}`,
-  },
+});
+
+// 🔥 Always get fresh token before every request
+API.interceptors.request.use((req) => {
+  const token = localStorage.getItem("token");
+
+  if (token) {
+    req.headers.Authorization = `Bearer ${token}`;
+  }
+
+  return req;
 });
 
 export default API;
