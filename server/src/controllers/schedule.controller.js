@@ -1,148 +1,126 @@
 import { Schedule } from "../models/schedule.model.js";
+import { Bus } from "../models/bus.model.js";
+import { Driver } from "../models/driver.model.js"; // ✅ IMPORTANT
+import { Route } from "../models/route.model.js";
 
+/* 🔧 helper */
+const combineDateTime = (date, time) => {
+  return new Date(`${date}T${time}`);
+};
 
-// Create Schedule
+/* ---------------- CREATE ---------------- */
 export const createSchedule = async (req, res) => {
   try {
+    const { bus, driver, route, date, departureTime, arrivalTime } = req.body;
 
-    const schedule = await Schedule.create(req.body);
+    const depTime = combineDateTime(date, departureTime);
+    const arrTime = combineDateTime(date, arrivalTime);
+
+    if (arrTime <= depTime) {
+      return res.status(400).json({
+        success: false,
+        message: "Arrival must be after departure",
+      });
+    }
+
+    const conflict = await Schedule.findOne({
+      $or: [{ bus }, { driver }],
+      departureTime: { $lt: arrTime },
+      arrivalTime: { $gt: depTime },
+    });
+
+    if (conflict) {
+      return res.status(400).json({
+        success: false,
+        message: "Bus/Driver already booked",
+      });
+    }
+
+    const schedule = await Schedule.create({
+      bus,
+      driver,
+      route,
+      date,
+      departureTime: depTime,
+      arrivalTime: arrTime,
+    });
 
     res.status(201).json({
       success: true,
-      message: "Schedule created successfully",
-      data: schedule
+      data: schedule,
     });
-
-  } catch (error) {
-
-    res.status(500).json({
-      success: false,
-      message: error.message
-    });
-
+  } catch (err) {
+    res.status(500).json({ success: false, message: err.message });
   }
 };
 
-
-
-// Get All Schedules
+/* ---------------- GET ALL ---------------- */
 export const getAllSchedules = async (req, res) => {
   try {
-
-    const schedules = await Schedule
-      .find()
+    const schedules = await Schedule.find()
       .populate("bus")
       .populate("route")
-      .populate("driver");
+      .populate("driver")
+      .sort({ departureTime: 1 });
 
-    res.status(200).json({
-      success: true,
-      data: schedules
-    });
-
-  } catch (error) {
-
-    res.status(500).json({
-      success: false,
-      message: error.message
-    });
-
+    res.json({ success: true, data: schedules });
+  } catch (err) {
+    res.status(500).json({ success: false, message: err.message });
   }
 };
 
-
-
-// Get Single Schedule
-export const getScheduleById = async (req, res) => {
-  try {
-
-    const schedule = await Schedule
-      .findById(req.params.id)
-      .populate("bus route driver");
-
-    if (!schedule) {
-      return res.status(404).json({
-        success: false,
-        message: "Schedule not found"
-      });
-    }
-
-    res.status(200).json({
-      success: true,
-      data: schedule
-    });
-
-  } catch (error) {
-
-    res.status(500).json({
-      success: false,
-      message: error.message
-    });
-
-  }
-};
-
-
-
-// Update Schedule
-export const updateSchedule = async (req, res) => {
-  try {
-
-    const schedule = await Schedule.findByIdAndUpdate(
-      req.params.id,
-      req.body,
-      { new: true }
-    );
-
-    if (!schedule) {
-      return res.status(404).json({
-        success: false,
-        message: "Schedule not found"
-      });
-    }
-
-    res.status(200).json({
-      success: true,
-      message: "Schedule updated successfully",
-      data: schedule
-    });
-
-  } catch (error) {
-
-    res.status(500).json({
-      success: false,
-      message: error.message
-    });
-
-  }
-};
-
-
-
-// Delete Schedule
+/* ---------------- DELETE ---------------- */
 export const deleteSchedule = async (req, res) => {
   try {
+    await Schedule.findByIdAndDelete(req.params.id);
+    res.json({ success: true, message: "Deleted" });
+  } catch (err) {
+    res.status(500).json({ success: false });
+  }
+};
 
-    const schedule = await Schedule.findByIdAndDelete(req.params.id);
+/* ---------------- AVAILABLE ---------------- */
+export const getAvailable = async (req, res) => {
+  try {
+    const { date, departureTime, arrivalTime } = req.query;
 
-    if (!schedule) {
-      return res.status(404).json({
+    if (!date || !departureTime || !arrivalTime) {
+      return res.status(400).json({
         success: false,
-        message: "Schedule not found"
+        message: "Missing params",
       });
     }
 
-    res.status(200).json({
+    const depTime = combineDateTime(date, departureTime);
+    const arrTime = combineDateTime(date, arrivalTime);
+
+    const conflicts = await Schedule.find({
+      departureTime: { $lt: arrTime },
+      arrivalTime: { $gt: depTime },
+    });
+
+    const busyBusIds = conflicts.map((c) => c.bus);
+    const busyDriverIds = conflicts.map((c) => c.driver);
+
+    const buses = await Bus.find({
+      _id: { $nin: busyBusIds },
+      status: "Active",
+    });
+
+    const drivers = await Driver.find({
+      _id: { $nin: busyDriverIds },
+      status: "Available",
+    });
+
+    const routes = await Route.find({
+      status: "Active",
+    });
+
+    res.json({
       success: true,
-      message: "Schedule deleted successfully"
+      data: { buses, drivers, routes },
     });
-
-  } catch (error) {
-
-    res.status(500).json({
-      success: false,
-      message: error.message
-    });
-
+  } catch (err) {
+    res.status(500).json({ success: false, message: err.message });
   }
 };

@@ -241,9 +241,9 @@ function Drivers() {
                       {driver.status}
                     </span>
                   </td>
-                  <td className={styles.actions}>
+                  <td className={styles.actions} >
                     <button
-                      className={styles.iconBtn}
+                      className={`${styles.iconBtn} ${styles.delete}`}
                       onClick={() => handleEdit(driver)}
                     >
                       <FaEdit />

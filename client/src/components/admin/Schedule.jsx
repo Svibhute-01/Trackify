@@ -1,263 +1,202 @@
 import React, { useEffect, useState } from "react";
 import styles from "./Schedule.module.css";
-import { FaTrash } from "react-icons/fa";
+import { FaTrash, FaEdit } from "react-icons/fa";
+import API from "../../api/api";
 
 const Schedule = () => {
   const [schedules, setSchedules] = useState([]);
-  const [buses, setBuses] = useState([]);
-  const [drivers, setDrivers] = useState([]);
-  const [routes, setRoutes] = useState([]);
-
-  const [formData, setFormData] = useState({
-    busId: "",
-    driverId: "",
-    routeId: "",
-    date: "",
-    departureTime: "",
-    status: "Scheduled",
+  const [available, setAvailable] = useState({
+    buses: [],
+    drivers: [],
+    routes: [],
   });
 
-  /* ---------------- LOAD DATA ---------------- */
+  const [editingId, setEditingId] = useState(null);
+
+  const [form, setForm] = useState({
+    date: "",
+    departureTime: "",
+    arrivalTime: "",
+    bus: "",
+    driver: "",
+    route: "",
+    status: "scheduled",
+  });
+
+  /* ---------------- FETCH ---------------- */
+  const fetchSchedules = async () => {
+    const res = await API.get("/schedules");
+    setSchedules(res.data.data || []);
+  };
+
   useEffect(() => {
-    const storedBuses = JSON.parse(localStorage.getItem("buses")) || [];
-    const storedDrivers = JSON.parse(localStorage.getItem("drivers")) || [];
-    const storedRoutes = JSON.parse(localStorage.getItem("routes")) || [];
-    const storedSchedules = JSON.parse(localStorage.getItem("schedules")) || [];
-
-    // Default Buses
-    if (storedBuses.length === 0) {
-      const defaultBuses = [
-        { id: 1, number: "BUS-101" },
-        { id: 2, number: "BUS-202" },
-      ];
-      localStorage.setItem("buses", JSON.stringify(defaultBuses));
-      setBuses(defaultBuses);
-    } else {
-      setBuses(storedBuses);
-    }
-
-    // Default Drivers
-    if (storedDrivers.length === 0) {
-      const defaultDrivers = [
-        { id: 1, name: "John Smith" },
-        { id: 2, name: "David Kumar" },
-      ];
-      localStorage.setItem("drivers", JSON.stringify(defaultDrivers));
-      setDrivers(defaultDrivers);
-    } else {
-      setDrivers(storedDrivers);
-    }
-
-    // Default Routes
-    if (storedRoutes.length === 0) {
-      const defaultRoutes = [
-        { id: 1, from: "City Center", to: "Airport" },
-        { id: 2, from: "Downtown", to: "Hill Station" },
-      ];
-      localStorage.setItem("routes", JSON.stringify(defaultRoutes));
-      setRoutes(defaultRoutes);
-    } else {
-      setRoutes(storedRoutes);
-    }
-
-    // Default Schedules
-    if (storedSchedules.length === 0) {
-      const defaultSchedules = [
-        {
-          id: 1,
-          busId: "1",
-          driverId: "1",
-          routeId: "1",
-          date: "2026-02-16",
-          departureTime: "09:00",
-          status: "Scheduled",
-        },
-        {
-          id: 2,
-          busId: "2",
-          driverId: "2",
-          routeId: "2",
-          date: "2026-02-16",
-          departureTime: "14:30",
-          status: "Scheduled",
-        },
-      ];
-      localStorage.setItem("schedules", JSON.stringify(defaultSchedules));
-      setSchedules(defaultSchedules);
-    } else {
-      setSchedules(storedSchedules);
-    }
+    fetchSchedules();
   }, []);
 
+  /* ---------------- AVAILABLE ---------------- */
   useEffect(() => {
-    localStorage.setItem("schedules", JSON.stringify(schedules));
-  }, [schedules]);
+    const fetchAvailable = async () => {
+      if (!form.date || !form.departureTime || !form.arrivalTime) return;
 
-  /* ---------------- AVAILABILITY CHECK ---------------- */
-  const isBusBooked = (busId) => {
-    return schedules.some(
-      (s) =>
-        s.busId === busId &&
-        s.date === formData.date &&
-        s.departureTime === formData.departureTime
-    );
-  };
+      const res = await API.get(
+        `/schedules/available?date=${form.date}&departureTime=${form.departureTime}&arrivalTime=${form.arrivalTime}`
+      );
 
-  const isDriverBooked = (driverId) => {
-    return schedules.some(
-      (s) =>
-        s.driverId === driverId &&
-        s.date === formData.date &&
-        s.departureTime === formData.departureTime
-    );
-  };
-
-  const handleChange = (e) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
-  };
-
-  const handleSubmit = (e) => {
-    e.preventDefault();
-
-    if (isBusBooked(formData.busId)) {
-      alert("Bus already assigned at this time!");
-      return;
-    }
-
-    if (isDriverBooked(formData.driverId)) {
-      alert("Driver already assigned at this time!");
-      return;
-    }
-
-    const newSchedule = {
-      id: Date.now(),
-      ...formData,
+      setAvailable(res.data.data);
     };
 
-    setSchedules([...schedules, newSchedule]);
+    fetchAvailable();
+  }, [form.date, form.departureTime, form.arrivalTime]);
 
-    setFormData({
-      busId: "",
-      driverId: "",
-      routeId: "",
-      date: "",
-      departureTime: "",
-      status: "Scheduled",
+  /* ---------------- INPUT ---------------- */
+  const handleChange = (e) => {
+    setForm({ ...form, [e.target.name]: e.target.value });
+  };
+
+  /* ---------------- SUBMIT ---------------- */
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+
+    try {
+      if (editingId) {
+        const res = await API.put(`/schedules/${editingId}`, form);
+
+        setSchedules((prev) =>
+          prev.map((s) => (s._id === editingId ? res.data.data : s))
+        );
+
+        setEditingId(null);
+      } else {
+        const res = await API.post("/schedules", form);
+        setSchedules((prev) => [...prev, res.data.data]);
+      }
+
+      setForm({
+        date: "",
+        departureTime: "",
+        arrivalTime: "",
+        bus: "",
+        driver: "",
+        route: "",
+        status: "scheduled",
+      });
+
+    } catch (err) {
+      alert(err.response?.data?.message || "Error");
+    }
+  };
+
+  /* ---------------- EDIT ---------------- */
+  const handleEdit = (s) => {
+    setForm({
+      date: s.date?.split("T")[0],
+      departureTime: s.departureTime?.slice(11, 16),
+      arrivalTime: s.arrivalTime?.slice(11, 16),
+      bus: s.bus?._id,
+      driver: s.driver?._id,
+      route: s.route?._id,
+      status: s.status,
     });
+
+    setEditingId(s._id);
   };
 
-  const handleDelete = (id) => {
-    const updated = schedules.filter((s) => s.id !== id);
-    setSchedules(updated);
-  };
+  /* ---------------- DELETE ---------------- */
+  const handleDelete = async (id) => {
+    if (!window.confirm("Delete this schedule?")) return;
 
-  const getBusNumber = (id) =>
-    buses.find((b) => b.id === Number(id))?.number || "N/A";
-
-  const getDriverName = (id) =>
-    drivers.find((d) => d.id === Number(id))?.name || "N/A";
-
-  const getRouteName = (id) => {
-    const route = routes.find((r) => r.id === Number(id));
-    return route ? `${route.from} → ${route.to}` : "N/A";
+    await API.delete(`/schedules/${id}`);
+    setSchedules((prev) => prev.filter((s) => s._id !== id));
   };
 
   return (
     <div className={styles.container}>
       <h2>Admin Schedule Management</h2>
 
-      {/* ASSIGN SECTION */}
+      {/* FORM */}
       <div className={styles.card}>
-        <h3>Assign Bus & Driver</h3>
+        <h3>{editingId ? "Edit Schedule" : "Assign Bus & Driver"}</h3>
 
         <form onSubmit={handleSubmit} className={styles.form}>
-          <input
-            type="date"
-            name="date"
-            value={formData.date}
-            onChange={handleChange}
-            required
-          />
+          <input type="date" name="date" value={form.date} onChange={handleChange} required />
+          <input type="time" name="departureTime" value={form.departureTime} onChange={handleChange} required />
+          <input type="time" name="arrivalTime" value={form.arrivalTime} onChange={handleChange} required />
 
-          <input
-            type="time"
-            name="departureTime"
-            value={formData.departureTime}
-            onChange={handleChange}
-            required
-          />
-
-          <select
-            name="busId"
-            value={formData.busId}
-            onChange={handleChange}
-            required
-          >
+          <select name="bus" value={form.bus} onChange={handleChange} required>
             <option value="">Select Bus</option>
-            {buses.map((bus) => (
-              <option key={bus.id} value={bus.id}>
-                {bus.number}
-              </option>
+            {available.buses?.map((b) => (
+              <option key={b._id} value={b._id}>{b.numberPlate}</option>
             ))}
           </select>
 
-          <select
-            name="driverId"
-            value={formData.driverId}
-            onChange={handleChange}
-            required
-          >
+          <select name="driver" value={form.driver} onChange={handleChange} required>
             <option value="">Select Driver</option>
-            {drivers.map((driver) => (
-              <option key={driver.id} value={driver.id}>
-                {driver.name}
-              </option>
+            {available.drivers?.map((d) => (
+              <option key={d._id} value={d._id}>{d.name}</option>
             ))}
           </select>
 
-          <select
-            name="routeId"
-            value={formData.routeId}
-            onChange={handleChange}
-            required
-          >
+          <select name="route" value={form.route} onChange={handleChange} required>
             <option value="">Select Route</option>
-            {routes.map((route) => (
-              <option key={route.id} value={route.id}>
-                {route.from} → {route.to}
-              </option>
+            {available.routes?.map((r) => (
+              <option key={r._id} value={r._id}>{r.from} → {r.to}</option>
             ))}
           </select>
 
-          <button type="submit">Assign Schedule</button>
+          <button type="submit">
+            {editingId ? "Update Schedule" : "Assign Schedule"}
+          </button>
         </form>
       </div>
 
-      {/* ALL ASSIGNMENTS */}
+      {/* TABLE */}
       <div className={styles.card}>
-        <h3>All Assignments</h3>
+        <h3>All Schedules</h3>
 
-        {schedules.length === 0 ? (
-          <p style={{ padding: "20px" }}>No schedules assigned yet.</p>
-        ) : (
-          schedules.map((schedule) => (
-            <div key={schedule.id} className={styles.scheduleCard}>
-              <div>
-                <strong>🚌 {getBusNumber(schedule.busId)}</strong>
-                <p>👨‍✈️ {getDriverName(schedule.driverId)}</p>
-                <p>🗺 {getRouteName(schedule.routeId)}</p>
-                <p>📅 {schedule.date}</p>
-                <p>🕒 {schedule.departureTime}</p>
-                <p>Status: {schedule.status}</p>
-              </div>
+        <table className={styles.table}>
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>Bus</th>
+              <th>Driver</th>
+              <th>Route</th>
+              <th>Date</th>
+              <th>Time</th>
+              <th>Status</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
 
-              <FaTrash
-                className={styles.deleteIcon}
-                onClick={() => handleDelete(schedule.id)}
-              />
-            </div>
-          ))
-        )}
+          <tbody>
+            {schedules.length === 0 ? (
+              <tr>
+                <td colSpan="8">No schedules found</td>
+              </tr>
+            ) : (
+              schedules.map((s, index) => (
+                <tr key={s._id}>
+                  <td>{index + 1}</td>
+                  <td>{s.bus?.numberPlate}</td>
+                  <td>{s.driver?.name}</td>
+                  <td>{s.route?.from} → {s.route?.to}</td>
+                  <td>{new Date(s.departureTime).toLocaleDateString()}</td>
+                  <td>
+                    {new Date(s.departureTime).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
+                    {" - "}
+                    {new Date(s.arrivalTime).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
+                  </td>
+                  <td>
+                    <span className={styles.status}>{s.status}</span>
+                  </td>
+                  <td className={styles.actions}>
+                    <FaEdit onClick={() => handleEdit(s)} />
+                    <FaTrash onClick={() => handleDelete(s._id)} />
+                  </td>
+                </tr>
+              ))
+            )}
+          </tbody>
+        </table>
       </div>
     </div>
   );
