@@ -1,90 +1,87 @@
-import { useState, useEffect } from "react";
-import { FaPlus, FaEdit, FaTrash } from "react-icons/fa";
-import styles from "./Drivers.module.css";
+import { useEffect, useState } from "react";
+import { FaPlus, FaEdit, FaTrash, FaTimes } from "react-icons/fa";
 import API from "../../api/api";
+import { useToast } from "../ui/Toast";
+import PageHeader from "../ui/PageHeader";
+import Card from "../ui/Card";
+import Button from "../ui/Button";
+import Input from "../ui/Input";
+import Select from "../ui/Select";
+import Spinner from "../ui/Spinner";
+import StatusBadge from "../ui/StatusBadge";
+import tableStyles from "../ui/DataTable.module.css";
+import styles from "./Drivers.module.css";
+
+const initialForm = {
+  name: "", license: "", contact: "", email: "", password: "", status: "Available",
+};
 
 function Drivers() {
+  const toast = useToast();
   const [drivers, setDrivers] = useState([]);
+  const [form, setForm] = useState(initialForm);
+  const [errors, setErrors] = useState({});
   const [editingId, setEditingId] = useState(null);
   const [loading, setLoading] = useState(false);
+  const [fetching, setFetching] = useState(true);
 
-  const [formData, setFormData] = useState({
-    name: "",
-    license: "",
-    contact: "",
-    email: "",
-    password: "",
-    status: "Available",
-  });
-
-  // 🔥 FETCH DRIVERS
   const fetchDrivers = async () => {
     try {
+      setFetching(true);
       const res = await API.get("/drivers");
-      const data = Array.isArray(res.data)
-        ? res.data
-        : res.data.data;
-
+      const data = Array.isArray(res.data) ? res.data : res.data.data;
       setDrivers(data || []);
-    } catch (err) {
-      console.error(err);
-      alert("Could not fetch drivers");
+    } catch {
+      toast.error("Could not fetch drivers");
+    } finally {
+      setFetching(false);
     }
   };
 
-  useEffect(() => {
-    fetchDrivers();
-  }, []);
+  useEffect(() => { fetchDrivers(); }, []);
 
-  // 🔥 HANDLE INPUT
   const handleChange = (e) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
+    setForm({ ...form, [e.target.name]: e.target.value });
+    if (errors[e.target.name]) setErrors({ ...errors, [e.target.name]: undefined });
   };
 
-  // 🔥 ADD / UPDATE DRIVER
+  const resetForm = () => { setForm(initialForm); setEditingId(null); setErrors({}); };
+
+  const validate = () => {
+    const e = {};
+    if (!form.name.trim()) e.name = "Name is required";
+    if (!form.license.trim()) e.license = "License is required";
+    if (!form.contact.trim()) e.contact = "Contact is required";
+    else if (!/^\d{10,15}$/.test(form.contact.replace(/\D/g, "")))
+      e.contact = "Enter a valid phone number";
+    if (!form.email.trim()) e.email = "Email is required";
+    else if (!/^\S+@\S+\.\S+$/.test(form.email)) e.email = "Invalid email";
+    if (!editingId && !form.password) e.password = "Password is required";
+    else if (form.password && form.password.length < 6)
+      e.password = "Min 6 characters";
+    setErrors(e);
+    return Object.keys(e).length === 0;
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
-
-    if (!formData.name || !formData.license || !formData.contact || !formData.email) {
-      alert("Please fill all required fields");
-      return;
-    }
-
+    if (!validate()) return;
     setLoading(true);
-
     try {
       if (editingId) {
         await API.put(`/drivers/${editingId}`, {
-          ...formData,
-          password: formData.password || undefined,
+          ...form,
+          password: form.password || undefined,
         });
-        alert("Driver updated successfully!");
+        toast.success("Driver updated");
       } else {
-        if (!formData.password) {
-          alert("Password is required");
-          setLoading(false);
-          return;
-        }
-
-        await API.post("/drivers/add", formData);
-        alert("Driver added successfully!");
+        await API.post("/drivers/add", form);
+        toast.success("Driver added");
       }
-
-      setFormData({
-        name: "",
-        license: "",
-        contact: "",
-        email: "",
-        password: "",
-        status: "Available",
-      });
-
-      setEditingId(null);
+      resetForm();
       fetchDrivers();
-
     } catch (err) {
-      console.error(err.response?.data);
-      alert(
+      toast.error(
         err.response?.data?.msg ||
         err.response?.data?.message ||
         "Operation failed"
@@ -94,9 +91,8 @@ function Drivers() {
     }
   };
 
-  // 🔥 EDIT
   const handleEdit = (driver) => {
-    setFormData({
+    setForm({
       name: driver.name,
       license: driver.license,
       contact: driver.contact,
@@ -105,161 +101,100 @@ function Drivers() {
       status: driver.status,
     });
     setEditingId(driver._id);
+    setErrors({});
   };
 
-  // 🔥 DELETE
   const handleDelete = async (id) => {
     if (!window.confirm("Delete this driver?")) return;
-
     try {
       await API.delete(`/drivers/${id}`);
       setDrivers((prev) => prev.filter((d) => d._id !== id));
-    } catch (err) {
-      console.error(err);
-      alert("Delete failed");
+      toast.success("Driver deleted");
+    } catch {
+      toast.error("Delete failed");
     }
   };
 
-  const getStatusClass = (status) => {
-    if (status === "Available") return styles.available;
-    if (status === "On Trip") return styles.onTrip;
-    if (status === "Off Duty") return styles.offDuty;
-    return "";
-  };
-
   return (
-    <div className={styles.container}>
-      <h2 className={styles.title}>Driver Management</h2>
+    <div>
+      <PageHeader title="Drivers" subtitle="Manage your driver roster" />
 
-      {/* FORM */}
-      <div className={styles.card}>
-        <h3>{editingId ? "Edit Driver" : "Add New Driver"}</h3>
-
-        <form className={styles.form} onSubmit={handleSubmit}>
-          <input
-            type="text"
-            name="name"
-            placeholder="Driver Name"
-            value={formData.name}
-            onChange={handleChange}
-            required
-          />
-
-          <input
-            type="text"
-            name="license"
-            placeholder="License Number"
-            value={formData.license}
-            onChange={handleChange}
-            required
-          />
-
-          <input
-            type="text"
-            name="contact"
-            placeholder="Contact Number"
-            value={formData.contact}
-            onChange={handleChange}
-            required
-          />
-
-          <input
-            type="email"
-            name="email"
-            placeholder="Email"
-            value={formData.email}
-            onChange={handleChange}
-            required
-          />
-
-          {!editingId && (
-            <input
-              type="password"
+      <div className={styles.grid}>
+        <Card title={editingId ? "Edit Driver" : "Add New Driver"}>
+          <form className={styles.form} onSubmit={handleSubmit}>
+            <Input label="Name" name="name" value={form.name} onChange={handleChange} error={errors.name} placeholder="Full name" />
+            <Input label="License Number" name="license" value={form.license} onChange={handleChange} error={errors.license} placeholder="e.g. DL12345" />
+            <Input label="Contact" name="contact" value={form.contact} onChange={handleChange} error={errors.contact} placeholder="10-digit number" />
+            <Input label="Email" name="email" type="email" value={form.email} onChange={handleChange} error={errors.email} placeholder="driver@example.com" />
+            <Input
+              label={editingId ? "New Password (optional)" : "Password"}
               name="password"
-              placeholder="Password"
-              value={formData.password}
+              type="password"
+              value={form.password}
               onChange={handleChange}
-              required
+              error={errors.password}
+              placeholder="••••••"
+              hint={editingId ? "Leave blank to keep current password" : undefined}
             />
+            <Select label="Status" name="status" value={form.status} onChange={handleChange}>
+              <option value="Available">Available</option>
+              <option value="On Trip">On Trip</option>
+              <option value="Off Duty">Off Duty</option>
+            </Select>
+            <div className={styles.actions}>
+              {editingId && (
+                <Button type="button" variant="ghost" icon={<FaTimes />} onClick={resetForm}>Cancel</Button>
+              )}
+              <Button type="submit" loading={loading} icon={!loading && <FaPlus />}>
+                {editingId ? "Update Driver" : "Add Driver"}
+              </Button>
+            </div>
+          </form>
+        </Card>
+
+        <Card title="All Drivers" subtitle={`${drivers.length} driver${drivers.length === 1 ? "" : "s"}`} padded={false}>
+          {fetching ? (
+            <div className={styles.center}><Spinner size={24} color="var(--color-primary)" /></div>
+          ) : (
+            <div className={tableStyles.tableWrap}>
+              <table className={tableStyles.table}>
+                <thead>
+                  <tr>
+                    <th>#</th>
+                    <th>Name</th>
+                    <th>License</th>
+                    <th>Contact</th>
+                    <th>Email</th>
+                    <th>Status</th>
+                    <th style={{ textAlign: "right" }}>Actions</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {drivers.length === 0 ? (
+                    <tr><td colSpan="7" className={tableStyles.empty}>No drivers yet</td></tr>
+                  ) : (
+                    drivers.map((d, i) => (
+                      <tr key={d._id}>
+                        <td>{i + 1}</td>
+                        <td>{d.name}</td>
+                        <td>{d.license}</td>
+                        <td>{d.contact}</td>
+                        <td>{d.email}</td>
+                        <td><StatusBadge status={d.status} /></td>
+                        <td>
+                          <div className={tableStyles.actions}>
+                            <button className={tableStyles.iconBtn} onClick={() => handleEdit(d)} aria-label="Edit"><FaEdit /></button>
+                            <button className={`${tableStyles.iconBtn} ${tableStyles.danger}`} onClick={() => handleDelete(d._id)} aria-label="Delete"><FaTrash /></button>
+                          </div>
+                        </td>
+                      </tr>
+                    ))
+                  )}
+                </tbody>
+              </table>
+            </div>
           )}
-
-          <select
-            name="status"
-            value={formData.status}
-            onChange={handleChange}
-          >
-            <option value="Available">Available</option>
-            <option value="On Trip">On Trip</option>
-            <option value="Off Duty">Off Duty</option>
-          </select>
-
-          <button type="submit" className={styles.addBtn} disabled={loading}>
-            <FaPlus />
-            {loading
-              ? editingId
-                ? " Updating..."
-                : " Adding..."
-              : editingId
-              ? " Update"
-              : " Add"}
-          </button>
-        </form>
-      </div>
-
-      {/* TABLE */}
-      <div className={styles.card}>
-        <h3>Drivers List</h3>
-
-        <table className={styles.table}>
-          <thead>
-            <tr>
-              <th>#</th>
-              <th>Name</th>
-              <th>License</th>
-              <th>Contact</th>
-              <th>Email</th>
-              <th>Status</th>
-              <th>Actions</th>
-            </tr>
-          </thead>
-
-          <tbody>
-            {drivers.length === 0 ? (
-              <tr>
-                <td colSpan="7">No drivers found</td>
-              </tr>
-            ) : (
-              drivers.map((driver, index) => (
-                <tr key={driver._id}>
-                  <td>{index + 1}</td>
-                  <td>{driver.name}</td>
-                  <td>{driver.license}</td>
-                  <td>{driver.contact}</td>
-                  <td>{driver.email}</td>
-                  <td>
-                    <span className={`${styles.statusBadge} ${getStatusClass(driver.status)}`}>
-                      {driver.status}
-                    </span>
-                  </td>
-                  <td className={styles.actions} >
-                    <button
-                      className={`${styles.iconBtn} ${styles.delete}`}
-                      onClick={() => handleEdit(driver)}
-                    >
-                      <FaEdit />
-                    </button>
-                    <button
-                      className={`${styles.iconBtn} ${styles.delete}`}
-                      onClick={() => handleDelete(driver._id)}
-                    >
-                      <FaTrash />
-                    </button>
-                  </td>
-                </tr>
-              ))
-            )}
-          </tbody>
-        </table>
+        </Card>
       </div>
     </div>
   );

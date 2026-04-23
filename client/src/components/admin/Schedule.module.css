@@ -1,175 +1,37 @@
-.container {
-  padding: 30px;
-}
-
-h2 {
-  margin-bottom: 20px;
-  color: #b71c1c;
-}
-
-.card {
-  background: #fff;
-  padding: 20px;
-  border-radius: 12px;
-  margin-bottom: 30px;
-  box-shadow: 0 4px 12px rgba(183, 28, 28, 0.1);
-}
-
 .form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.row3 {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-  gap: 15px;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--space-3);
 }
 
-select,
-input {
-  padding: 10px;
-  border: 1px solid #ddd;
-  border-radius: 6px;
+@media (max-width: 720px) {
+  .row3 { grid-template-columns: 1fr; }
 }
 
-button {
-  background: #d32f2f;
-  color: white;
-  border: none;
-  padding: 10px;
-  border-radius: 6px;
-  cursor: pointer;
-  transition: 0.3s;
-}
-
-button:hover {
-  background: #b71c1c;
-}
-
-.scheduleCard {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  background: #fafafa;
-  padding: 15px;
-  border-radius: 10px;
-  margin-bottom: 15px;
-  border-left: 4px solid #d32f2f;
-}
-
-.rightSection {
+.hint {
   display: flex;
   align-items: center;
-  gap: 15px;
-}
-
-.deleteIcon {
-  cursor: pointer;
-  color: #c62828;
-}
-
-.deleteIcon:hover {
-  color: #b71c1c;
-}
-
-.scheduled {
-  background: #fff3e0;
-  color: #ef6c00;
-  padding: 5px 12px;
-  border-radius: 20px;
+  gap: 8px;
+  padding: 10px 14px;
+  background: var(--color-info-soft);
+  color: #1d4ed8;
+  border-radius: var(--radius-sm);
   font-size: 13px;
 }
 
-.completed {
-  background: #e8f5e9;
-  color: #2e7d32;
-  padding: 5px 12px;
-  border-radius: 20px;
-  font-size: 13px;
+.actions { display: flex; justify-content: flex-end; gap: var(--space-2); margin-top: var(--space-2); }
+
+.center { display: flex; justify-content: center; padding: var(--space-10); }
+
+.bus {
+  font-weight: 600;
+  letter-spacing: 0.04em;
 }
 
-.cancelled {
-  background: #ffebee;
-  color: #c62828;
-  padding: 5px 12px;
-  border-radius: 20px;
-  font-size: 13px;
-}
-
-.empty {
-  text-align: center;
-  color: #888;
-}
-.scheduleCard {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  background: #f9f9f9;
-  padding: 15px;
-  border-radius: 12px;
-  margin-bottom: 12px;
-  border-left: 5px solid #e53935;
-}
-
-.left h4 {
-  margin: 0;
-}
-
-.middle {
-  text-align: center;
-}
-
-.status {
-  padding: 4px 10px;
-  border-radius: 10px;
-  font-size: 12px;
-  font-weight: bold;
-}
-
-.scheduled {
-  background: #fff3cd;
-}
-
-.running {
-  background: #cce5ff;
-}
-
-.completed {
-  background: #d4edda;
-}
-
-.cancelled {
-  background: #f8d7da;
-}
-
-.actions {
-  display: flex;
-  gap: 10px;
-  cursor: pointer;
-  font-size: 18px;
-}
-
-.table {
-  width: 100%;
-  border-collapse: collapse;
-}
-
-.table th {
-  background: #f5f5f5;
-  padding: 10px;
-  text-align: left;
-}
-
-.table td {
-  padding: 10px;
-  border-top: 1px solid #eee;
-}
-
-.status {
-  background: #d4edda;
-  padding: 4px 10px;
-  border-radius: 10px;
-  font-size: 12px;
-}
-
-.actions {
-  display: flex;
-  gap: 10px;
-  cursor: pointer;
-}
+.muted { color: var(--color-text-muted); font-size: 13px; }

@@ -1,87 +1,57 @@
 import { useState } from "react";
-import { NavLink, useNavigate } from "react-router-dom";
+import { NavLink, Link } from "react-router-dom";
+import { FaBars, FaTimes } from "react-icons/fa";
 import styles from "./Navbar.module.css";
-import logo from "../assets/logo.png";
 
 function Navbar() {
-  const [menuOpen, setMenuOpen] = useState(false);
-  const navigate = useNavigate();
+  const [open, setOpen] = useState(false);
+  const close = () => setOpen(false);
+
+  const links = [
+    { to: "/", label: "Home", end: true },
+    { to: "/search", label: "Search Buses" },
+  ];
 
   return (
     <nav className={styles.navbar}>
-      
-      {/* LOGO */}
-      <div className={styles.logo} onClick={() => navigate("/")}>
-        <img src={logo} alt="Trackify Logo" />
-      </div>
+      <Link to="/" className={styles.brand} onClick={close}>
+        <span className={styles.brandIcon}>🚍</span>
+        <span className={styles.brandName}>Trackify</span>
+      </Link>
 
-      {/* HAMBURGER */}
-      <div
+      <button
         className={styles.hamburger}
-        onClick={() => setMenuOpen(!menuOpen)}
+        onClick={() => setOpen((v) => !v)}
+        aria-label="Toggle menu"
       >
-        ☰
-      </div>
+        {open ? <FaTimes /> : <FaBars />}
+      </button>
 
-      {/* NAV LINKS */}
-      <ul className={`${styles.navLinks} ${menuOpen ? styles.showMenu : ""}`}>
-        
-        <li>
-          <NavLink
-            to="/"
-            onClick={() => setMenuOpen(false)}
-            className={styles.navItem}
-          >
-            Home
-          </NavLink>
-        </li>
-
-        <li>
-          <NavLink
-            to="/track"
-            onClick={() => setMenuOpen(false)}
-            className={styles.navItem}
-          >
-            Track Bus
-          </NavLink>
-        </li>
-
-        <li>
-          <NavLink
-            to="/routes"
-            onClick={() => setMenuOpen(false)}
-            className={styles.navItem}
-          >
-            Routes
-          </NavLink>
-        </li>
-
-        <li>
-          <NavLink
-            to="/favorites"
-            onClick={() => setMenuOpen(false)}
-            className={styles.navItem}
-          >
-            Favorites
-          </NavLink>
-        </li>
-
-        {/* 📱 Mobile Login */}
+      <ul className={`${styles.navLinks} ${open ? styles.showMenu : ""}`}>
+        {links.map((l) => (
+          <li key={l.to}>
+            <NavLink
+              to={l.to}
+              end={l.end}
+              onClick={close}
+              className={({ isActive }) =>
+                `${styles.navItem} ${isActive ? styles.active : ""}`
+              }
+            >
+              {l.label}
+            </NavLink>
+          </li>
+        ))}
         <li className={styles.mobileOnly}>
-          <NavLink
-            to="/login"
-            className={styles.mobileLogin}
-            onClick={() => setMenuOpen(false)}
-          >
-            Login
-          </NavLink>
+          <Link to="/login" className={styles.loginBtnMobile} onClick={close}>
+            Sign in
+          </Link>
         </li>
       </ul>
 
-      {/* 💻 Desktop Login */}
-      <NavLink to="/login" className={styles.loginBtn}>
-        Login
-      </NavLink>
+      <Link to="/login" className={styles.loginBtn}>
+        Sign in
+      </Link>
     </nav>
   );
 }

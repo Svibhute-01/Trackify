@@ -1,57 +1,75 @@
-.container {
+.sidebar {
   width: 240px;
-  background: linear-gradient(180deg, #d14a4f, #d81f1f);
- /* Dark Red */
-  color: white;
-  height: 100vh;
-  padding: 20px;
+  background: var(--color-surface);
+  border-right: 1px solid var(--color-border);
   display: flex;
   flex-direction: column;
+  padding: var(--space-5) var(--space-3);
+  position: sticky;
+  top: 0;
+  height: 100vh;
 }
 
-
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 4px var(--space-3) var(--space-5);
+  border-bottom: 1px solid var(--color-border);
+  margin-bottom: var(--space-4);
+}
+.brandIcon { font-size: 22px; }
+.brandName { font-weight: 700; font-size: 18px; letter-spacing: -0.01em; }
 
 .menu {
-  list-style: none;
-  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
   flex: 1;
 }
 
 .item {
-  padding: 12px 15px;
-  margin-bottom: 8px;
-  border-radius: 8px;
-  cursor: pointer;
   display: flex;
   align-items: center;
   gap: 12px;
-  transition: all 0.3s ease;
+  padding: 10px 12px;
+  color: var(--color-text-muted);
+  border-radius: var(--radius-sm);
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.15s ease, color 0.15s ease;
+  text-decoration: none;
 }
-
-.item:hover {
-  background: rgba(255, 255, 255, 0.15);
+.item:hover { background: var(--color-surface-2); color: var(--color-text); }
+.item.active {
+  background: var(--color-primary-soft);
+  color: var(--color-primary);
 }
-
-.active {
-  background: white;
-  color: #8b0000; /* Match red */
-  font-weight: 600;
-}
-
 .icon {
-  font-size: 16px;
+  display: inline-flex;
+  width: 18px;
+  justify-content: center;
 }
 
 .logout {
-  padding: 12px 15px;
-  cursor: pointer;
   display: flex;
   align-items: center;
-  gap: 10px;
-  border-radius: 8px;
-  transition: all 0.3s ease;
+  gap: 12px;
+  padding: 10px 12px;
+  background: transparent;
+  border: none;
+  color: var(--color-text-muted);
+  font-size: 14px;
+  font-weight: 500;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  text-align: left;
 }
+.logout:hover { background: var(--color-danger-soft); color: var(--color-danger); }
 
-.logout:hover {
-  background: rgba(255, 255, 255, 0.15);
+@media (max-width: 768px) {
+  .sidebar { width: 64px; padding: var(--space-3) var(--space-2); }
+  .brandName, .item span:last-child, .logout span { display: none; }
+  .item, .logout { justify-content: center; }
 }

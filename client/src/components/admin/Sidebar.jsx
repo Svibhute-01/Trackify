@@ -1,63 +1,58 @@
-import styles from "./Sidebar.module.css";
+import { NavLink, useNavigate } from "react-router-dom";
 import {
   FaTachometerAlt,
   FaBus,
   FaUserTie,
   FaRoute,
   FaCalendarAlt,
-  FaUsers,
-  FaChartBar,
-  FaBell,
-  FaCog,
   FaSignOutAlt,
 } from "react-icons/fa";
+import styles from "./Sidebar.module.css";
 
-import { useNavigate, useLocation } from "react-router-dom";
+const menuItems = [
+  { name: "Dashboard", icon: <FaTachometerAlt />, path: "/admin", end: true },
+  { name: "Buses", icon: <FaBus />, path: "/admin/add-bus" },
+  { name: "Drivers", icon: <FaUserTie />, path: "/admin/add-driver" },
+  { name: "Routes", icon: <FaRoute />, path: "/admin/add-route" },
+  { name: "Schedules", icon: <FaCalendarAlt />, path: "/admin/schedule-bus" },
+];
 
 function Sidebar() {
   const navigate = useNavigate();
-  const location = useLocation();
 
-  const menuItems = [
-    { name: "Dashboard", icon: <FaTachometerAlt />, path: "/admin" },
-    { name: "Buses", icon: <FaBus />, path: "/admin/add-bus" },
-    { name: "Drivers", icon: <FaUserTie />, path: "/admin/add-driver" },
-    { name: "Routes", icon: <FaRoute />, path: "/admin/add-route" },
-    { name: "Schedules", icon: <FaCalendarAlt />, path: "/admin/schedule-bus" },
-    { name: "Users", icon: <FaUsers />, path: "/admin/users" },
-    { name: "Reports", icon: <FaChartBar />, path: "/admin/reports" },
-    { name: "Notifications", icon: <FaBell />, path: "/admin/notifications" },
-    { name: "Settings", icon: <FaCog />, path: "/admin/settings" },
-  ];
+  const handleLogout = () => {
+    localStorage.removeItem("token");
+    navigate("/");
+  };
 
   return (
-    <div className={styles.container}>
-      <ul className={styles.menu}>
+    <aside className={styles.sidebar}>
+      <div className={styles.brand}>
+        <span className={styles.brandIcon}>🚍</span>
+        <span className={styles.brandName}>Trackify</span>
+      </div>
+
+      <nav className={styles.menu}>
         {menuItems.map((item) => (
-          <li
+          <NavLink
             key={item.name}
-            className={`${styles.item} ${
-              location.pathname === item.path ? styles.active : ""
-            }`}
-            onClick={() => navigate(item.path)}
+            to={item.path}
+            end={item.end}
+            className={({ isActive }) =>
+              `${styles.item} ${isActive ? styles.active : ""}`
+            }
           >
             <span className={styles.icon}>{item.icon}</span>
             <span>{item.name}</span>
-          </li>
+          </NavLink>
         ))}
-      </ul>
+      </nav>
 
-      <div
-        className={styles.logout}
-        onClick={() => {
-          // later: clear JWT token
-          navigate("/");
-        }}
-      >
+      <button className={styles.logout} onClick={handleLogout}>
         <FaSignOutAlt className={styles.icon} />
         Logout
-      </div>
-    </div>
+      </button>
+    </aside>
   );
 }
 

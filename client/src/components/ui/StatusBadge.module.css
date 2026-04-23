@@ -1,0 +1,24 @@
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 10px;
+  border-radius: var(--radius-pill);
+  font-size: 12px;
+  font-weight: 500;
+  text-transform: capitalize;
+  white-space: nowrap;
+}
+
+.dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: currentColor;
+}
+
+.success { background: var(--color-success-soft); color: #047857; }
+.warning { background: var(--color-warning-soft); color: #b45309; }
+.danger  { background: var(--color-danger-soft);  color: #b91c1c; }
+.info    { background: var(--color-info-soft);    color: #1d4ed8; }
+.neutral { background: var(--color-surface-2);    color: var(--color-text-muted); }

@@ -1,0 +1,18 @@
+.wrapper { position: relative; display: block; }
+
+.select {
+  appearance: none;
+  -webkit-appearance: none;
+  padding-right: 32px;
+  background: var(--color-surface);
+}
+
+.chevron {
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 12px;
+  color: var(--color-text-muted);
+  pointer-events: none;
+}

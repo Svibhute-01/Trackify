@@ -1,324 +1,273 @@
-import { useState, useEffect } from "react";
-import { FaPlus, FaTrash, FaEdit } from "react-icons/fa";
-import styles from "./Routes.module.css";
+import { useEffect, useState } from "react";
+import { FaPlus, FaTrash, FaEdit, FaTimes, FaMapMarkerAlt } from "react-icons/fa";
 import API from "../../api/api";
+import { useToast } from "../ui/Toast";
+import PageHeader from "../ui/PageHeader";
+import Card from "../ui/Card";
+import Button from "../ui/Button";
+import Input from "../ui/Input";
+import Select from "../ui/Select";
+import Spinner from "../ui/Spinner";
+import StatusBadge from "../ui/StatusBadge";
+import tableStyles from "../ui/DataTable.module.css";
+import styles from "./Routes.module.css";
+
+const initialForm = {
+  routeName: "", routeCode: "", from: "", to: "",
+  distance: "", duration: "", status: "Active", stops: [], stopInput: "",
+};
 
 function Routes() {
+  const toast = useToast();
   const [routes, setRoutes] = useState([]);
+  const [form, setForm] = useState(initialForm);
+  const [errors, setErrors] = useState({});
   const [editingId, setEditingId] = useState(null);
   const [selectedStops, setSelectedStops] = useState(null);
-
-  const [formData, setFormData] = useState({
-    routeName: "",
-    routeCode: "",
-    from: "",
-    to: "",
-    distance: "",
-    duration: "",
-    status: "Active",
-    stops: [],
-    stopInput: "",
-  });
-
-  // 🔥 FETCH ROUTES
-  useEffect(() => {
-    fetchRoutes();
-  }, []);
+  const [loading, setLoading] = useState(false);
+  const [fetching, setFetching] = useState(true);
 
   const fetchRoutes = async () => {
     try {
+      setFetching(true);
       const res = await API.get("/routes");
       const data = Array.isArray(res.data) ? res.data : res.data.data;
       setRoutes(data || []);
-    } catch (err) {
-      console.error(err);
-      setRoutes([]);
-    }
+    } catch {
+      toast.error("Could not fetch routes");
+    } finally { setFetching(false); }
   };
 
-  // INPUT CHANGE
+  useEffect(() => { fetchRoutes(); }, []);
+
   const handleChange = (e) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
+    setForm({ ...form, [e.target.name]: e.target.value });
+    if (errors[e.target.name]) setErrors({ ...errors, [e.target.name]: undefined });
   };
 
-  // ADD STOP
+  const validate = () => {
+    const e = {};
+    if (!form.routeName.trim()) e.routeName = "Required";
+    if (!form.routeCode.trim()) e.routeCode = "Required";
+    if (!form.from.trim()) e.from = "Required";
+    if (!form.to.trim()) e.to = "Required";
+    if (form.from.trim().toLowerCase() === form.to.trim().toLowerCase() && form.from)
+      e.to = "Destination must differ from origin";
+    setErrors(e);
+    return Object.keys(e).length === 0;
+  };
+
   const addStop = () => {
-    if (!formData.stopInput.trim()) return;
-
-    const newStop = {
-      name: formData.stopInput,
-      order: formData.stops.length + 1,
-    };
-
-    setFormData({
-      ...formData,
-      stops: [...formData.stops, newStop],
-      stopInput: "",
-    });
+    if (!form.stopInput.trim()) return;
+    const newStop = { name: form.stopInput.trim(), order: form.stops.length + 1 };
+    setForm({ ...form, stops: [...form.stops, newStop], stopInput: "" });
   };
 
-  // REMOVE STOP
   const removeStop = (index) => {
-    const updatedStops = formData.stops
-      .filter((_, i) => i !== index)
-      .map((stop, i) => ({ ...stop, order: i + 1 }));
-
-    setFormData({ ...formData, stops: updatedStops });
+    const updated = form.stops.filter((_, i) => i !== index).map((s, i) => ({ ...s, order: i + 1 }));
+    setForm({ ...form, stops: updated });
   };
 
-  // CREATE / UPDATE
+  const resetForm = () => { setForm(initialForm); setEditingId(null); setErrors({}); };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
+    if (!validate()) return;
 
-    const cleanData = {
-      routeName: formData.routeName,
-      routeCode: formData.routeCode,
-      from: formData.from,
-      to: formData.to,
-      distance: Number(formData.distance),
-      duration: Number(formData.duration),
-      status: formData.status,
-      stops: formData.stops,
+    setLoading(true);
+    const payload = {
+      routeName: form.routeName,
+      routeCode: form.routeCode,
+      from: form.from,
+      to: form.to,
+      distance: form.distance ? Number(form.distance) : undefined,
+      duration: form.duration ? Number(form.duration) : undefined,
+      status: form.status,
+      stops: form.stops,
     };
 
     try {
       if (editingId) {
-        const res = await API.put(`/routes/${editingId}`, cleanData);
+        const res = await API.put(`/routes/${editingId}`, payload);
         const updated = res.data.data || res.data;
-
         setRoutes(routes.map((r) => (r._id === editingId ? updated : r)));
-
-        setEditingId(null);
+        toast.success("Route updated");
       } else {
-        const res = await API.post("/routes/add", cleanData);
+        const res = await API.post("/routes/add", payload);
         const newRoute = res.data.data || res.data;
-
         setRoutes([...routes, newRoute]);
+        toast.success("Route created");
       }
-
-      // RESET
-      setFormData({
-        routeName: "",
-        routeCode: "",
-        from: "",
-        to: "",
-        distance: "",
-        duration: "",
-        status: "Active",
-        stops: [],
-        stopInput: "",
-      });
+      resetForm();
     } catch (err) {
-      console.error("Save error:", err);
+      toast.error(err.response?.data?.message || "Operation failed");
+    } finally {
+      setLoading(false);
     }
   };
 
-  // EDIT
   const handleEdit = (route) => {
-    setFormData({
+    setForm({
       routeName: route.routeName,
       routeCode: route.routeCode,
       from: route.from,
       to: route.to,
-      distance: route.distance,
-      duration: route.duration,
+      distance: route.distance || "",
+      duration: route.duration || "",
       status: route.status,
       stops: route.stops || [],
       stopInput: "",
     });
-
     setEditingId(route._id);
+    setErrors({});
   };
 
-  // DELETE
   const handleDelete = async (id) => {
     if (!window.confirm("Delete this route?")) return;
-
     try {
       await API.delete(`/routes/${id}`);
       setRoutes(routes.filter((r) => r._id !== id));
-    } catch (err) {
-      console.error("Delete error:", err);
+      toast.success("Route deleted");
+    } catch {
+      toast.error("Delete failed");
     }
   };
 
   return (
-    <div className={styles.container}>
-      <h2 className={styles.title}>Routes Management</h2>
+    <div>
+      <PageHeader title="Routes" subtitle="Define routes and their stops" />
 
-      {/* FORM */}
-      <div className={styles.card}>
-        <h3>{editingId ? "Edit Route" : "Create Route"}</h3>
+      <div className={styles.grid}>
+        <Card title={editingId ? "Edit Route" : "Create Route"}>
+          <form onSubmit={handleSubmit} className={styles.form}>
+            <div className={styles.row2}>
+              <Input label="Route Name" name="routeName" value={form.routeName} onChange={handleChange} error={errors.routeName} placeholder="Express A1" />
+              <Input label="Route Code" name="routeCode" value={form.routeCode} onChange={handleChange} error={errors.routeCode} placeholder="EXP-A1" />
+            </div>
+            <div className={styles.row2}>
+              <Input label="From" name="from" value={form.from} onChange={handleChange} error={errors.from} placeholder="Origin" />
+              <Input label="To" name="to" value={form.to} onChange={handleChange} error={errors.to} placeholder="Destination" />
+            </div>
+            <div className={styles.row2}>
+              <Input label="Distance (km)" name="distance" type="number" value={form.distance} onChange={handleChange} placeholder="120" />
+              <Input label="Duration (mins)" name="duration" type="number" value={form.duration} onChange={handleChange} placeholder="180" />
+            </div>
+            <Select label="Status" name="status" value={form.status} onChange={handleChange}>
+              <option>Active</option>
+              <option>Inactive</option>
+            </Select>
 
-        <form onSubmit={handleSubmit} className={styles.form}>
-          <input
-            name="routeName"
-            placeholder="Route Name"
-            value={formData.routeName}
-            onChange={handleChange}
-            required
-          />
-          <input
-            name="routeCode"
-            placeholder="Route Code"
-            value={formData.routeCode}
-            onChange={handleChange}
-            required
-          />
-          <input
-            name="from"
-            placeholder="From"
-            value={formData.from}
-            onChange={handleChange}
-            required
-          />
-          <input
-            name="to"
-            placeholder="To"
-            value={formData.to}
-            onChange={handleChange}
-            required
-          />
-          <input
-            type="number"
-            name="distance"
-            placeholder="Distance (km)"
-            value={formData.distance}
-            onChange={handleChange}
-          />
-          <input
-            type="number"
-            name="duration"
-            placeholder="Duration (mins)"
-            value={formData.duration}
-            onChange={handleChange}
-          />
-
-          <select name="status" value={formData.status} onChange={handleChange}>
-            <option>Active</option>
-            <option>Inactive</option>
-          </select>
-
-          {/* STOPS */}
-          <div className={styles.stopSection}>
-            <input
-              placeholder="Add Stop"
-              value={formData.stopInput}
-              onChange={(e) =>
-                setFormData({ ...formData, stopInput: e.target.value })
-              }
-            />
-            <button type="button" onClick={addStop}>
-              <FaPlus />
-            </button>
-          </div>
-
-          <div className={styles.stopsList}>
-            {formData.stops.map((stop, i) => (
-              <div key={i} className={styles.stopItem}>
-                {stop.name}
-                <FaTrash onClick={() => removeStop(i)} />
+            <div>
+              <label className={styles.label}>Stops</label>
+              <div className={styles.stopAdd}>
+                <Input
+                  name="stopInput"
+                  placeholder="Add a stop and press +"
+                  value={form.stopInput}
+                  onChange={(e) => setForm({ ...form, stopInput: e.target.value })}
+                  onKeyDown={(e) => { if (e.key === "Enter") { e.preventDefault(); addStop(); } }}
+                />
+                <Button type="button" variant="secondary" onClick={addStop} icon={<FaPlus />}>Add</Button>
               </div>
-            ))}
-          </div>
-
-          <div className={styles.formActions}>
-            <button type="submit" className={styles.submitBtn}>
-              {editingId ? "Update Route" : "Create Route"}
-            </button>
-          </div>
-        </form>
-      </div>
-
-      {/* TABLE UI */}
-      <div className={styles.card}>
-        <h3>All Routes</h3>
-
-        {routes.length === 0 ? (
-          <p className={styles.empty}>No routes found</p>
-        ) : (
-          <div className={styles.routeTable}>
-            <div className={styles.tableHeader}>
-              <span>Name</span>
-              <span>Code</span>
-              <span>Route</span>
-              <span>Stops</span>
-              <span>Distance</span>
-              <span>Status</span>
-              <span>Actions</span>
+              {form.stops.length > 0 && (
+                <div className={styles.stopChips}>
+                  {form.stops.map((stop, i) => (
+                    <span key={i} className={styles.chip}>
+                      <span className={styles.chipNum}>{i + 1}</span>
+                      {stop.name}
+                      <button type="button" onClick={() => removeStop(i)} aria-label="Remove"><FaTimes /></button>
+                    </span>
+                  ))}
+                </div>
+              )}
             </div>
 
-            {routes.map((route) => (
-              <div key={route._id} className={styles.tableRow}>
-                <span>{route.routeName}</span>
-                <span>{route.routeCode}</span>
-                <span>
-                  {route.from} → {route.to}
-                </span>
+            <div className={styles.actions}>
+              {editingId && (
+                <Button type="button" variant="ghost" icon={<FaTimes />} onClick={resetForm}>Cancel</Button>
+              )}
+              <Button type="submit" loading={loading} icon={!loading && <FaPlus />}>
+                {editingId ? "Update Route" : "Create Route"}
+              </Button>
+            </div>
+          </form>
+        </Card>
 
-                {/* STOP BADGE */}
-                <span
-                  className={styles.stopBadge}
-                  onClick={() => setSelectedStops(route.stops)}
-                >
-                  {route.stops?.length || 0}
-                </span>
-
-                <span>
-                  {route.distance} km | {route.duration} min
-                </span>
-
-                <span
-                  className={
-                    route.status === "Active"
-                      ? styles.activeStatus
-                      : styles.inactiveStatus
-                  }
-                >
-                  {route.status}
-                </span>
-
-                <div className={styles.actions}>
-                  <FaEdit onClick={() => handleEdit(route)} />
-                  <FaTrash onClick={() => handleDelete(route._id)} />
-                </div>
-              </div>
-            ))}
-          </div>
-        )}
+        <Card title="All Routes" subtitle={`${routes.length} route${routes.length === 1 ? "" : "s"}`} padded={false}>
+          {fetching ? (
+            <div className={styles.center}><Spinner size={24} color="var(--color-primary)" /></div>
+          ) : (
+            <div className={tableStyles.tableWrap}>
+              <table className={tableStyles.table}>
+                <thead>
+                  <tr>
+                    <th>Code</th>
+                    <th>Name</th>
+                    <th>Route</th>
+                    <th>Stops</th>
+                    <th>Distance</th>
+                    <th>Status</th>
+                    <th style={{ textAlign: "right" }}>Actions</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {routes.length === 0 ? (
+                    <tr><td colSpan="7" className={tableStyles.empty}>No routes yet</td></tr>
+                  ) : (
+                    routes.map((r) => (
+                      <tr key={r._id}>
+                        <td className={styles.code}>{r.routeCode}</td>
+                        <td>{r.routeName}</td>
+                        <td className={styles.routeCol}>
+                          <span>{r.from}</span>
+                          <span className={styles.arrow}>→</span>
+                          <span>{r.to}</span>
+                        </td>
+                        <td>
+                          <button className={styles.stopsBtn} onClick={() => setSelectedStops(r.stops || [])}>
+                            <FaMapMarkerAlt /> {r.stops?.length || 0}
+                          </button>
+                        </td>
+                        <td className={styles.muted}>
+                          {r.distance ? `${r.distance} km` : "—"}
+                          {r.duration ? ` · ${r.duration} min` : ""}
+                        </td>
+                        <td><StatusBadge status={r.status} /></td>
+                        <td>
+                          <div className={tableStyles.actions}>
+                            <button className={tableStyles.iconBtn} onClick={() => handleEdit(r)} aria-label="Edit"><FaEdit /></button>
+                            <button className={`${tableStyles.iconBtn} ${tableStyles.danger}`} onClick={() => handleDelete(r._id)} aria-label="Delete"><FaTrash /></button>
+                          </div>
+                        </td>
+                      </tr>
+                    ))
+                  )}
+                </tbody>
+              </table>
+            </div>
+          )}
+        </Card>
       </div>
 
-      {/* MODAL */}
-      {selectedStops && (
-        <div
-          className={styles.modalOverlay}
-          onClick={() => setSelectedStops(null)}
-        >
+      {selectedStops !== null && (
+        <div className={styles.modalOverlay} onClick={() => setSelectedStops(null)}>
           <div className={styles.modal} onClick={(e) => e.stopPropagation()}>
-            {/* HEADER */}
             <div className={styles.modalHeader}>
               <h3>Route Stops</h3>
-              <span
-                className={styles.closeBtn}
-                onClick={() => setSelectedStops(null)}
-              >
-                ✕
-              </span>
+              <button className={styles.closeBtn} onClick={() => setSelectedStops(null)} aria-label="Close"><FaTimes /></button>
             </div>
-
-            {/* CONTENT */}
             <div className={styles.modalContent}>
               {selectedStops.length === 0 ? (
-                <p className={styles.empty}>No stops available</p>
+                <p className={styles.muted}>No stops defined</p>
               ) : (
-                <ul className={styles.stopList}>
-                  {selectedStops.map((stop, i) => (
-                    <li key={i} className={styles.stopRow}>
-                      <span className={styles.stopIndex}>{i + 1}</span>
-                      <span className={styles.stopName}>{stop.name}</span>
+                <ol className={styles.stopList}>
+                  {selectedStops.map((s, i) => (
+                    <li key={i}>
+                      <span className={styles.chipNum}>{i + 1}</span>
+                      {s.name}
                     </li>
                   ))}
-                </ul>
+                </ol>
               )}
             </div>
           </div>

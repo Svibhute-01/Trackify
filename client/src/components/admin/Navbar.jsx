@@ -1,19 +1,23 @@
+import { FaBell } from "react-icons/fa";
 import styles from "./Navbar.module.css";
 
 function Navbar() {
   return (
-    <div className={styles.container}>
-      <input
-        type="text"
-        placeholder="Search buses, routes, drivers..."
-        className={styles.search}
-      />
-
-      <div className={styles.admin}>
-        🔔
-        <span>Admin</span>
+    <header className={styles.bar}>
+      <div className={styles.spacer} />
+      <div className={styles.right}>
+        <button className={styles.iconBtn} aria-label="Notifications">
+          <FaBell />
+        </button>
+        <div className={styles.user}>
+          <div className={styles.avatar}>A</div>
+          <div className={styles.userMeta}>
+            <span className={styles.userName}>Admin</span>
+            <span className={styles.userRole}>Administrator</span>
+          </div>
+        </div>
       </div>
-    </div>
+    </header>
   );
 }
 

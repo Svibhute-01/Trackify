@@ -1,0 +1,45 @@
+.container {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, var(--color-bg) 0%, var(--color-primary-soft) 100%);
+  padding: var(--space-5);
+}
+
+.cardWrap {
+  width: 100%;
+  max-width: 420px;
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  margin-bottom: var(--space-5);
+}
+.brandIcon { font-size: 28px; }
+.brandName { font-weight: 700; font-size: 22px; letter-spacing: -0.01em; }
+
+.title { font-size: 22px; margin-bottom: 4px; }
+.subtitle {
+  margin: 0 0 var(--space-5);
+  color: var(--color-text-muted);
+  font-size: 14px;
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.footer {
+  margin: var(--space-5) 0 0;
+  text-align: center;
+  font-size: 14px;
+  color: var(--color-text-muted);
+}
+.link { font-weight: 500; }
+.link:hover { text-decoration: underline; }

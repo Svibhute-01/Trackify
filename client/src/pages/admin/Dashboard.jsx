@@ -1,41 +1,106 @@
-import StatCard from "../../components/admin/StatCard";
-import styles from "./Dashboard.module.css";
+import { useEffect, useState } from "react";
 import {
   FaBus,
   FaUserTie,
-  FaUsers,
   FaRoute,
-  FaExclamationTriangle,
+  FaCalendarAlt,
 } from "react-icons/fa";
+import StatCard from "../../components/admin/StatCard";
+import PageHeader from "../../components/ui/PageHeader";
+import Card from "../../components/ui/Card";
+import Spinner from "../../components/ui/Spinner";
+import StatusBadge from "../../components/ui/StatusBadge";
+import API from "../../api/api";
+import styles from "./Dashboard.module.css";
 
 function Dashboard() {
+  const [stats, setStats] = useState({ buses: 0, activeBuses: 0, drivers: 0, routes: 0, schedules: 0 });
+  const [recent, setRecent] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchAll = async () => {
+      try {
+        const [b, d, r, s] = await Promise.all([
+          API.get("/buses"),
+          API.get("/drivers"),
+          API.get("/routes"),
+          API.get("/schedules"),
+        ]);
+        const buses = b.data.data || b.data || [];
+        const drivers = d.data.data || d.data || [];
+        const routes = r.data.data || r.data || [];
+        const schedules = s.data.data || s.data || [];
+
+        setStats({
+          buses: buses.length,
+          activeBuses: buses.filter((x) => x.status === "Active").length,
+          drivers: drivers.length,
+          routes: routes.filter((x) => x.status === "Active").length,
+          schedules: schedules.length,
+        });
+        setRecent(schedules.slice(-5).reverse());
+      } catch (err) {
+        console.error(err);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchAll();
+  }, []);
+
   return (
-    <div className={styles.container}>
-      <h1 className={styles.title}>Dashboard Overview</h1>
+    <div>
+      <PageHeader
+        title="Dashboard"
+        subtitle="Overview of your fleet at a glance"
+      />
 
-      {/* STAT CARDS */}
-      <div className={styles.cardGrid}>
-        <StatCard title="Total Buses" value="124" icon={<FaBus />} color="red" />
-        <StatCard title="Active Buses" value="87" icon={<FaBus />} color="green" />
-        <StatCard title="Total Drivers" value="156" icon={<FaUserTie />} color="orange" />
-        <StatCard title="Total Users" value="1243" icon={<FaUsers />} color="blue" />
-        <StatCard title="Active Routes" value="42" icon={<FaRoute />} color="purple" />
-        <StatCard title="Delayed Buses" value="8" icon={<FaExclamationTriangle />} color="danger" />
-      </div>
-
-      {/* QUICK VISUAL SECTION */}
-      <div className={styles.visualSection}>
-        
-
-        <div className={styles.mapSection}>
-          <h3>📍 Live Map Preview</h3>
-          <div className={styles.mapPlaceholder}>
-            <div className={styles.mapCircle}></div>
-            <p>Map integration coming soon</p>
-            <span>Real-time bus tracking will appear here</span>
-          </div>
+      {loading ? (
+        <div className={styles.loading}>
+          <Spinner size={28} color="var(--color-primary)" />
         </div>
-      </div>
+      ) : (
+        <>
+          <div className={styles.cardGrid}>
+            <StatCard title="Total Buses" value={stats.buses} icon={<FaBus />} color="primary" />
+            <StatCard title="Active Buses" value={stats.activeBuses} icon={<FaBus />} color="green" />
+            <StatCard title="Drivers" value={stats.drivers} icon={<FaUserTie />} color="orange" />
+            <StatCard title="Active Routes" value={stats.routes} icon={<FaRoute />} color="purple" />
+            <StatCard title="Total Schedules" value={stats.schedules} icon={<FaCalendarAlt />} color="blue" />
+          </div>
+
+          <div className={styles.recent}>
+            <Card title="Recent Schedules" subtitle="Last 5 created">
+              {recent.length === 0 ? (
+                <p className={styles.empty}>No schedules yet.</p>
+              ) : (
+                <ul className={styles.list}>
+                  {recent.map((s) => (
+                    <li key={s._id} className={styles.row}>
+                      <div className={styles.rowMain}>
+                        <span className={styles.bus}>{s.bus?.numberPlate || "—"}</span>
+                        <span className={styles.route}>
+                          {s.route?.from} → {s.route?.to}
+                        </span>
+                      </div>
+                      <div className={styles.rowMeta}>
+                        <span className={styles.time}>
+                          {new Date(s.departureTime).toLocaleString([], {
+                            month: "short", day: "numeric",
+                            hour: "2-digit", minute: "2-digit",
+                          })}
+                        </span>
+                        <StatusBadge status={s.status} />
+                      </div>
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </Card>
+          </div>
+        </>
+      )}
     </div>
   );
 }
