@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { NavLink, Link } from "react-router-dom";
 import { FaBars, FaTimes } from "react-icons/fa";
+import logo from "../assets/logo.png";
 import styles from "./Navbar.module.css";
 
 function Navbar() {
@@ -14,11 +15,9 @@ function Navbar() {
 
   return (
     <nav className={styles.navbar}>
-      <Link to="/" className={styles.brand} onClick={close}>
-        <span className={styles.brandIcon}>🚍</span>
-        <span className={styles.brandName}>Trackify</span>
+            <Link to="/" className={styles.brand} onClick={close}>
+        <img src={logo} alt="Trackify Logo" className={styles.logo} />
       </Link>
-
       <button
         className={styles.hamburger}
         onClick={() => setOpen((v) => !v)}

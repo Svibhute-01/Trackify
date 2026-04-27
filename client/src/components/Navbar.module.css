@@ -119,3 +119,17 @@
     font-weight: 500;
   }
 }
+
+
+.logo {
+  height: 50px;        /* fits nicely in 64px navbar */
+  width: auto;
+  object-fit: contain;
+  display: block;
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  height: 100%;
+}
