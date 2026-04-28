@@ -122,7 +122,7 @@
 
 
 .logo {
-  height: 50px;        /* fits nicely in 64px navbar */
+  height: 150px;        /* fits nicely in 64px navbar */
   width: auto;
   object-fit: contain;
   display: block;
