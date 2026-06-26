@@ -7,6 +7,8 @@ import {
   getAvailable,
   updateSchedule,
   searchSchedules,
+  getDriverSchedules,
+  updateTripStatus,
 } from "../controllers/schedule.controller.js";
 
 import { protect } from "../middleware/auth.middleware.js";
@@ -19,6 +21,10 @@ router.get("/search", searchSchedules);
 
 /* IMPORTANT (FIRST) */
 router.get("/available", protect, getAvailable);
+
+/* DRIVER routes */
+router.get("/driver/:driverId", protect, getDriverSchedules);
+router.patch("/:id/status", protect, updateTripStatus);
 
 /* CRUD */
 router.post("/", protect, authorize("admin"), createSchedule);

@@ -67,8 +67,8 @@ export const updateDriver = async (req, res) => {
       req.body.password = await bcrypt.hash(password, 10);
     }
 
-    const driver = await Driver.findOneAndUpdate(
-      { _id: req.params.id, role: "driver" },
+    const driver = await Driver.findByIdAndUpdate(
+      req.params.id,
       req.body,
       { new: true }
     ).select("-password");
@@ -91,10 +91,7 @@ export const updateDriver = async (req, res) => {
 // ================= DELETE DRIVER =================
 export const deleteDriver = async (req, res) => {
   try {
-    const driver = await Driver.findOneAndDelete({
-      _id: req.params.id,
-      role: "driver",
-    });
+    const driver = await Driver.findByIdAndDelete(req.params.id);
 
     if (!driver) {
       return res.status(404).json({ msg: "Driver not found" });

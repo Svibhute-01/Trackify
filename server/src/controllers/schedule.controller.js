@@ -1,6 +1,6 @@
 import { Schedule } from "../models/schedule.model.js";
 import { Bus } from "../models/bus.model.js";
-import { Driver } from "../models/driver.model.js"; // ✅ IMPORTANT
+import { Driver } from "../models/driver.model.js";
 import { Route } from "../models/route.model.js";
 
 /* 🔧 helper */
@@ -143,6 +143,106 @@ export const deleteSchedule = async (req, res) => {
   }
 };
 
+/* ---------------- DRIVER: GET MY SCHEDULES ---------------- */
+export const getDriverSchedules = async (req, res) => {
+  try {
+    const driverId = req.params.driverId;
+
+    const schedules = await Schedule.find({ driver: driverId })
+      .populate("bus")
+      .populate("route")
+      .populate("driver")
+      .sort({ departureTime: 1 });
+
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const tomorrow = new Date(today);
+    tomorrow.setDate(tomorrow.getDate() + 1);
+
+    const todayTrips = schedules.filter((s) => {
+      const dep = new Date(s.departureTime);
+      return dep >= today && dep < tomorrow;
+    });
+
+    const upcoming = schedules.filter((s) => {
+      const dep = new Date(s.departureTime);
+      return dep >= tomorrow && s.status === "scheduled";
+    });
+
+    const completed = schedules.filter((s) => s.status === "completed");
+
+    res.json({
+      success: true,
+      data: { all: schedules, today: todayTrips, upcoming, completed },
+    });
+  } catch (err) {
+    res.status(500).json({ success: false, message: err.message });
+  }
+};
+
+/* ---------------- DRIVER: UPDATE TRIP STATUS ---------------- */
+export const updateTripStatus = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { status } = req.body;
+
+    const schedule = await Schedule.findById(id).populate("bus").populate("route").populate("driver");
+    if (!schedule) {
+      return res.status(404).json({ success: false, message: "Schedule not found" });
+    }
+
+    // Only the assigned driver or admin can update
+    const requesterId = req.user._id.toString();
+    const driverId = schedule.driver._id
+      ? schedule.driver._id.toString()
+      : schedule.driver.toString();
+
+    if (req.user.role !== "admin" && requesterId !== driverId) {
+      return res.status(403).json({ success: false, message: "Not authorized" });
+    }
+
+    // Validate transitions
+    const allowed = {
+      scheduled: ["running", "cancelled"],
+      running: ["completed", "cancelled"],
+    };
+
+    if (!allowed[schedule.status]?.includes(status)) {
+      return res.status(400).json({
+        success: false,
+        message: `Cannot transition from '${schedule.status}' to '${status}'`,
+      });
+    }
+
+    // Business rule: only one trip can be running per bus at a time
+    if (status === "running") {
+      const alreadyRunning = await Schedule.findOne({
+        _id: { $ne: id },
+        bus: schedule.bus._id,
+        status: "running",
+      });
+      if (alreadyRunning) {
+        return res.status(400).json({
+          success: false,
+          message: "Another trip for this bus is already running",
+        });
+      }
+    }
+
+    schedule.status = status;
+    await schedule.save();
+
+    const updated = await Schedule.findById(id)
+      .populate("bus")
+      .populate("route")
+      .populate("driver");
+
+    res.json({ success: true, data: updated });
+  } catch (err) {
+    res.status(500).json({ success: false, message: err.message });
+  }
+};
+
 /* ---------------- PUBLIC SEARCH ---------------- */
 const escapeRegex = (str) => str.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 
@@ -167,7 +267,6 @@ export const searchSchedules = async (req, res) => {
       return res.json({ success: true, data: [] });
     }
 
-    // Today + upcoming, scheduled or running only
     const startOfToday = new Date();
     startOfToday.setHours(0, 0, 0, 0);
 

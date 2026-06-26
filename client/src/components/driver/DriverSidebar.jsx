@@ -1,82 +1,69 @@
-import React from "react";
-import styles from "./DriverSidebar.module.css";
+import { NavLink, useNavigate } from "react-router-dom";
 import {
-  FiGrid,
-  FiPercent,
-  FiCalendar,
-  FiMail,
-  FiBarChart2,
-  FiTruck,
-  FiFlag,
-  FiHelpCircle,
-  FiSettings,
-  FiLogOut,
-} from "react-icons/fi";
+  FaTachometerAlt,
+  FaCalendarAlt,
+  FaRoute,
+  FaSignOutAlt,
+  FaUserCircle,
+} from "react-icons/fa";
+import styles from "./DriverSidebar.module.css";
 
-const DriverSidebar = () => {
+const menuItems = [
+  { name: "Dashboard", icon: <FaTachometerAlt />, path: "/driver/dashboard", end: true },
+  { name: "My Schedule", icon: <FaCalendarAlt />, path: "/driver/dashboard" },
+  { name: "My Trips", icon: <FaRoute />, path: "/driver/dashboard" },
+];
+
+function DriverSidebar() {
+  const navigate = useNavigate();
+  const userRaw = localStorage.getItem("user");
+  const user = userRaw ? JSON.parse(userRaw) : {};
+
+  const handleLogout = () => {
+    localStorage.removeItem("token");
+    localStorage.removeItem("user");
+    navigate("/login");
+  };
+
   return (
-    <div className={styles.sidebar}>
-      <div className={styles.logo}>
-        <span className={styles.globe}>🌐</span>
-        Trakify
+    <aside className={styles.sidebar}>
+      <div className={styles.brand}>
+        <span className={styles.brandIcon}>🚍</span>
+        <span className={styles.brandName}>Trackify</span>
       </div>
 
-      <div className={styles.menu}>
-        <div className={`${styles.menuItem} ${styles.active}`}>
-          <FiGrid />
-          <span>Dashboard</span>
+      <div className={styles.driverCard}>
+        <div className={styles.driverAvatar}>
+          {(user.name || "D").charAt(0).toUpperCase()}
         </div>
-
-        <div className={styles.menuItem}>
-          <FiPercent />
-          <span>Trips</span>
-        </div>
-
-        <div className={styles.menuItem}>
-          <FiCalendar />
-          <span>Schedule</span>
-        </div>
-
-        <div className={styles.menuItem}>
-          <FiMail />
-          <span>Messages</span>
-          <span className={styles.badge}>2</span>
-        </div>
-
-        <div className={styles.menuItem}>
-          <FiBarChart2 />
-          <span>Analytics</span>
-        </div>
-
-        <div className={styles.menuItem}>
-          <FiTruck />
-          <span>Vehicles</span>
-        </div>
-
-        <div className={styles.menuItem}>
-          <FiFlag />
-          <span>Report</span>
-        </div>
-
-        <div className={styles.menuItem}>
-          <FiHelpCircle />
-          <span>Support</span>
+        <div className={styles.driverInfo}>
+          <span className={styles.driverName}>{user.name || "Driver"}</span>
+          <span className={styles.driverRole}>Driver</span>
         </div>
       </div>
 
-      <div className={styles.bottom}>
-        <div className={styles.menuItem}>
-          <FiSettings />
-          <span>Settings</span>
-        </div>
+      <nav className={styles.menu}>
+        {menuItems.map((item) => (
+          <NavLink
+            key={item.name}
+            to={item.path}
+            end={item.end}
+            className={({ isActive }) =>
+              `${styles.item} ${isActive ? styles.active : ""}`
+            }
+          >
+            <span className={styles.icon}>{item.icon}</span>
+            <span>{item.name}</span>
+          </NavLink>
+        ))}
+      </nav>
 
-        <div className={styles.menuItem}>
-          <FiLogOut />
-          <span>Log out</span>
-        </div>
-      </div>
-    </div>
+      <button className={styles.logout} onClick={handleLogout}>
+        <FaSignOutAlt className={styles.icon} />
+        Logout
+      </button>
+    </aside>
   );
-};
+}
 
 export default DriverSidebar;

@@ -1,10 +1,9 @@
 import axios from "axios";
 
 const API = axios.create({
-  baseURL: "http://localhost:4000",
+  baseURL: "",
 });
 
-// 🔥 Always get fresh token before every request
 API.interceptors.request.use((req) => {
   const token = localStorage.getItem("token");
 

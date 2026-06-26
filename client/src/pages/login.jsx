@@ -35,12 +35,21 @@ const Login = () => {
     setLoading(true);
     try {
       const res = await API.post("/auth/login", form);
-      localStorage.setItem("token", res.data.token);
-      const role = res.data.user?.role || res.data.role;
+      const { token, role, name, _id, driverId } = res.data;
+      const userRole = role || res.data.user?.role;
+
+      localStorage.setItem("token", token);
+      localStorage.setItem("user", JSON.stringify({
+        role: userRole,
+        name: name || res.data.user?.name,
+        id: _id,
+        driverId: driverId || _id,
+      }));
+
       toast.success("Welcome back!");
-      navigate(role === "driver" ? "/driver/dashboard" : "/admin");
+      navigate(userRole === "driver" ? "/driver/dashboard" : "/admin");
     } catch (err) {
-      toast.error(err.response?.data?.message || "Login failed");
+      toast.error(err.response?.data?.message || err.response?.data?.msg || "Login failed");
     } finally {
       setLoading(false);
     }

@@ -1,10 +1,10 @@
 import React, { StrictMode } from "react";
 import ReactDOM from "react-dom/client";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
-
+import 'leaflet/dist/leaflet.css';
 import DriverLayout from "./pages/driver/DriverLayout";
 import DriverDashboard from "./pages/driver/DriverDashboard";
-import AdminLayout  from "./pages/admin/AdminLayout.jsx"
+import AdminLayout from "./pages/admin/AdminLayout.jsx";
 import "./index.css";
 import App from "./App.jsx";
 import { ToastProvider } from "./components/ui/Toast.jsx";
@@ -17,6 +17,8 @@ import Login from "./pages/login.jsx";
 import Register from "./pages/register.jsx";
 import Search from "./pages/public/Search.jsx";
 import ProtectedRoute from "./components/protectedRoute.jsx";
+import Map from "./components/Map.jsx";
+
 const router = createBrowserRouter([
   {
     path: "/",
@@ -27,46 +29,39 @@ const router = createBrowserRouter([
     element: <Search />,
   },
   {
+    path: "/track",
+    element: <Map/>
+  },
+  {
     path: "/login",
-    element: <Login />
+    element: <Login />,
   },
   {
     path: "/register",
-    element: <Register />
+    element: <Register />,
   },
   {
-  path: "/admin",
-  element: (
-    <ProtectedRoute>
-      <AdminLayout />
-    </ProtectedRoute>
-  ),
-  children: [
-    {
-      index: true,
-      element: <Dashboard />
-    },
-    {
-      path: "add-bus",
-      element: <Buses />
-    },
-    {
-      path: "add-driver",
-      element: <Drivers />
-    },
-    {
-      path: "add-route",
-      element: <Routes />
-    },
-    {
-      path: "schedule-bus",
-      element: <Schedule />
-    }
-  ]
-},
+    path: "/admin",
+    element: (
+      <ProtectedRoute role="admin">
+        <AdminLayout />
+      </ProtectedRoute>
+    ),
+    children: [
+      { index: true, element: <Dashboard /> },
+      { path: "add-bus", element: <Buses /> },
+      { path: "add-driver", element: <Drivers /> },
+      { path: "add-route", element: <Routes /> },
+      { path: "schedule-bus", element: <Schedule /> },
+    ],
+  },
   {
     path: "/driver",
-    element: <DriverLayout />,
+    element: (
+      <ProtectedRoute role="driver">
+        <DriverLayout />
+      </ProtectedRoute>
+    ),
     children: [
       {
         path: "dashboard",

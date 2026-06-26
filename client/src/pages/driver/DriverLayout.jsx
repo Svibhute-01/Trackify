@@ -1,22 +1,17 @@
-import React from "react";
 import { Outlet } from "react-router-dom";
 import DriverSidebar from "../../components/driver/DriverSidebar";
+import DriverNavbar from "../../components/driver/DriverNavbar";
+import styles from "./DriverLayout.module.css";
 
 const DriverLayout = () => {
   return (
-    <div style={{ display: "flex", minHeight: "100vh", background: "#f3f4f6" }}>
+    <div className={styles.shell}>
       <DriverSidebar />
-
-      <div
-        style={{
-          flex: 1,
-          padding: "40px",
-          maxWidth: "1300px",
-          margin: "0 auto",
-          width: "100%",
-        }}
-      >
-        <Outlet />
+      <div className={styles.mainSection}>
+        <DriverNavbar />
+        <main className={styles.content}>
+          <Outlet />
+        </main>
       </div>
     </div>
   );
